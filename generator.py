@@ -1,43 +1,97 @@
 import random
-from colorama import init, Fore
 
 class MazeGen:
     def __init__(self):
-        init()
-        self._maze = [[],[]]# * userChoice
+        self._mazeMap = {}
 
-    #Generatos the basic maze with "u" (unvisted) as all its slots
-    def genMaze(self, width, height):
+    #This Procedure will generate a maze grid layout of the users chosen size
+    def genMaze(self, height:int=10, width:int=10) -> dict:
+        '''
+        Generatos the raw maze dictonary base with its Walls and type
+        Type: Undefined cell 0, Defined path cell 1, Start 2, End 3.
+        '''
+
+        y = 0
+        for _ in range(height): # height
+            x = 1
+            y += 1
+            for _ in range(width): # widths
+                self._mazeMap[x,y]={'E':1,'W':1,'N':1,'S':1,'Type':0}
+                x += 1  
+
+    def setMazeMap(self, newMazeMap:dict) -> dict:
+        self._mazeMap = newMazeMap
+
+    def getMazeMap(self) -> dict:
+        print(self._mazeMap)
+        return self._mazeMap
+
+    #This will pick the starting point for the maze
+    def startPos(self):
         ...
-        '''for _ in range(height):
-            line = []
-            for _ in range(width):
-                line.append("u")
-            self._maze.append(line)
-        self.startPos(height, width)
-        self.printMaze(self._maze)'''   
+   
+    def getStartPos(self):
+        return self.startPos()
+    
+    #This will pick the end point for maze
+    def endPos():
+        ...   
+    
+    #Algorithm to generate a random path
+    def randomPathGen():
+        ...
 
-    def startPos(self, height, width):
-        startingHeight = random.randint(1,height-1)
-        startingWidth = random.randint(1,width-1)
-        self.maze[startingHeight][startingWidth] = f" {self.cell}" 
-        self.addWall(startingHeight, startingWidth)  
+    #Finds the next move of the random maze generator
+    def findNextMove():
+        ...
 
-    def addWall(self, startingHeight, startingWidth):
-        ... 
-            
-        
+    #If a deadEnd is hit run this function
+    def deadEnd():
+        ...
 
     #Prints out the maze
     def printMaze(self, maze):
-        for i in range(len(maze)):
-            for j in range(len(maze[0])):
-                if maze[i][j] == "u":
-                    print(Fore.WHITE, f"{maze[i][j]}", end=" ")
-                elif maze[i][j] == "W":
-                    print(Fore.RED, f"{maze[i][j]}", end=" ")
-                else:
-                    print(f"{maze[i][j]}", end=" ")
-            print("\n")
- 
+        for x,y in range():
+            ...
 
+    def delNorth(self,x:int,y:int):
+        self._mazeMap[x,y]["N"] = 0
+        if y-1 > 0:
+            self._mazeMap[x,y-1]["N"] = 0
+    
+    def delEast(self,x:int,y:int):
+        self._mazeMap[x,y]["E"] = 0
+        if y-1 > 0:
+            self._mazeMap[x,y-1]["E"] = 0   
+
+    def delSouth(self,x:int,y:int):
+        self._mazeMap[x,y]["S"] = 0
+        if y-1 > 0:
+            self._mazeMap[x,y-1]["S"] = 0
+
+    def delWest(self,x:int,y:int):
+        self._mazeMap[x,y]["W"] = 0
+        if y-1 > 0:
+            self._mazeMap[x,y-1]["W"] = 0
+
+    def getCell(self):
+        ...
+
+    def changeCell(self):
+        ...
+class HuntAndKill(MazeGen):
+    def __init__(self):
+        super().__init__()
+        self._lastSolvedLine = 0
+
+    def algorithm():
+        ...
+
+    def SearchBlankCell():
+        ...
+
+class RDFS(MazeGen):
+    def __init__(self):
+        super().__init__()
+
+    
