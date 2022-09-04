@@ -12,8 +12,8 @@ class Terminal(Ui):
 
     def run(self):
         self._gen.genMaze(self._height, self._width)
-        self._gen.delNorth(1,1)
         self._gen.getMazeMap()
+        #self._gen.printMaze()
 
     def changeHeight(self, newWidth):
         self._width = newWidth
