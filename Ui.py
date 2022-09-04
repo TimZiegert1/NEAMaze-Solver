@@ -1,4 +1,5 @@
 from generator import *
+from tkinter import *
 
 class Ui:
     def __init__(self):
@@ -14,7 +15,7 @@ class Terminal(Ui):
         self._gen.genMaze(self._height, self._width)
         self._gen.getMazeMap()
         #self._gen.printMaze()
-
+        self._gen.printMaze()
     def changeHeight(self, newWidth):
         self._width = newWidth
     
