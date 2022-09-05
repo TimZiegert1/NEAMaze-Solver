@@ -37,7 +37,6 @@ class GUI(Ui):
         self._canvas = Canvas()
 
     def run(self):
-        self._canvas.create_line(1)
         self._win.mainloop()
 
     def changeStart(self):

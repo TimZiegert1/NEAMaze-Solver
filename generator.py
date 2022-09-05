@@ -83,8 +83,9 @@ class MazeGen:
         return self._mazeMap  
     
     #Algorithm to generate a random path
-    def randomPathGen():
-        ...
+    def randomPathGen(self):
+        direction = random.choice(self._Compass)
+        return direction
 
     #Finds the next move of the random maze generator
     def findNextMove():
