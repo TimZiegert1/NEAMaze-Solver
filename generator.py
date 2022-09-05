@@ -1,6 +1,6 @@
 import random
 from Ui import *
-#from pyamaze import maze
+
 class MazeGen:
     def __init__(self):
         self._mazeMap = {}
@@ -23,6 +23,8 @@ class MazeGen:
         edgeList = self.pickEdge(width, height)
         self.startPos(edgeList[0])
         self.endPos(edgeList[1])
+        
+        
 
     def setMazeMap(self, newMazeMap:dict) -> dict:
         self._mazeMap = newMazeMap

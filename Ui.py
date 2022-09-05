@@ -31,10 +31,14 @@ class Terminal(Ui):
 class GUI(Ui):
     def __init__(self):
         super().__init__()
-        ...
+        self._win=Tk()
+        self._win.state('zoomed')
+        self._win.title('Maze')
+        self._canvas = Canvas()
 
     def run(self):
-        ...
+        self._canvas.create_line(1)
+        self._win.mainloop()
 
     def changeStart(self):
         ...
