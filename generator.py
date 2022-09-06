@@ -1,6 +1,8 @@
 import random
 from Ui import *
 
+#Test
+
 class MazeGen:
     def __init__(self):
         self._mazeMap = {}
