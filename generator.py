@@ -1,8 +1,6 @@
 import random
 from Ui import *
 
-#Test
-
 class MazeGen:
     def __init__(self):
         self._mazeMap = {}
@@ -37,7 +35,6 @@ class MazeGen:
 
     def pickEdge(self, width:int, height:int) -> list:
         edge = random.randint(1,4)
-        print(edge)
         if edge == 1: #North
             #Start Coord
             startCoord = [random.randint(1, width),1]
@@ -70,17 +67,17 @@ class MazeGen:
 
     #This will pick the starting point for the maze
     def startPos(self, edgeCoord:list) -> dict:
-        print(edgeCoord)
+        #print(edgeCoord)
         self.changeCellType(edgeCoord[0], edgeCoord[1], 2)
         return self._mazeMap
         
-   
+    @property
     def getStartPos(self):
         return self.startPos()
     
     #This will pick the end point for maze
     def endPos(self, edgeCoord:list) -> dict:
-        print(edgeCoord)
+        #print(edgeCoord)
         self.changeCellType(edgeCoord[0], edgeCoord[1], 3)
         return self._mazeMap  
     
@@ -110,6 +107,9 @@ class MazeGen:
         ...
 
     def delNorth(self,x:int,y:int):
+        '''
+        Checks for a wall on the coords inputed and with change that wall type into a 0 denoting that the wall is removed
+        '''
         self._mazeMap[x,y]["N"] = 0
         try:
             if self._mazeMap[x,y-1]["S"] > 0:
@@ -174,6 +174,23 @@ class MazeGen:
         Changes the celltype with the x and y coords to the chosen newCellType
         '''
         self._mazeMap[x,y]["Type"] = newCellType
+
+class BFS(MazeGen):
+    def __init__(self):
+        super().__init__()
+        self._stack = [MazeGen.getStartPos]
+        self._visited = []
+
+    def run(self):
+        self.getStack()
+
+    def nextCell(self):
+        ...
+
+    @property
+    def getStack(self):
+        return self._stack
+
 
 class HuntAndKill(MazeGen):
     def __init__(self):
