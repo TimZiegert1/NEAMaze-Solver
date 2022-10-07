@@ -31,10 +31,18 @@ class Terminal(Ui):
 class GUI(Ui):
     def __init__(self):
         super().__init__()
-        ...
+        self._LabWidth = 26
+        self._win = Tk()
+        self._win.state('zoomed')
+        self._win.title("Maze")
+        scr_width=self._win.winfo_screenwidth()
+        scr_height=self._win.winfo_screenheight()
+        self._win.geometry(f"{scr_width}x{scr_height}+0+0")
+        self._canvas = Canvas(width=scr_width, height=scr_height) 
+        self._canvas.pack(expand=YES, fill=BOTH)
 
     def run(self):
-        ...
+        self._win.mainloop()
 
     def changeStart(self):
         ...

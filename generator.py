@@ -1,28 +1,35 @@
 import random
 from Ui import *
-#from pyamaze import maze
+from pyamaze import maze,COLOR
+from collections import deque
 class MazeGen:
     def __init__(self):
         self._mazeMap = {}
+        
         self._Compass = ["N", "E", "S", "W"]
 
 
-    #This Procedure will generate a maze grid layout of the users chosen size
     def genMaze(self, height:int=10, width:int=10) -> dict: 
         '''
-        Generatos the raw maze dictonary base with its Walls and type
+        Generates the raw maze dict base with its Walls and type
         Type: Undefined cell 0, Defined path cell 1, Start 2, End 3.
         '''
+        self._grid = []
         y = 0
         for _ in range(height): # height
             x = 1
             y += 1
             for _ in range(width): # widths
+                self._grid.append((x,y))
                 self._mazeMap[x,y]={'N':1,'E':1,'S':1,'W':1,'Type':0}
                 x += 1  
         edgeList = self.pickEdge(width, height)
+        print(self._grid)
         self.startPos(edgeList[0])
         self.endPos(edgeList[1])
+        m = maze(height,width)
+        m.CreateMaze()
+        m.run()
 
     def setMazeMap(self, newMazeMap:dict) -> dict:
         self._mazeMap = newMazeMap
@@ -170,6 +177,13 @@ class MazeGen:
         '''
         self._mazeMap[x,y]["Type"] = newCellType
 
+
+class BFS(MazeGen):
+    def __init__(self):
+        super().__init__()
+        self._lastSolvedLine = 0
+
+
 class HuntAndKill(MazeGen):
     def __init__(self):
         super().__init__()
@@ -184,5 +198,3 @@ class HuntAndKill(MazeGen):
 class RDFS(MazeGen):
     def __init__(self):
         super().__init__()
-
-    

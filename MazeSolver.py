@@ -1,4 +1,4 @@
-from Ui import Terminal #, Gui
+from Ui import Terminal, GUI
 from sys import argv
 
 def usage():   
@@ -12,8 +12,8 @@ if __name__ == "__main__":
     if len(argv) != 2:
         usage()
     if argv[1] == 'g':
-        #ui = Gui()
-        #ui.run()
+        ui = GUI()
+        ui.run()
         pass
     elif argv[1] == 't':
         ui = Terminal()
