@@ -1,7 +1,6 @@
 from generator import *
-from tkinter import *
-from generator import *
-from pygame import *
+import tkinter as tk
+import pygame
 class Ui:
     def __init__(self):
         self._gen = MazeGen()
@@ -32,32 +31,47 @@ class Terminal(Ui):
 class GUI(Ui):
     def __init__(self):
         super().__init__()
-        self._main = Tk()
+        pygame.init()
+        self._mazeMap = self._gen.getMazeMap()
+        #self._font = pygame.font.Font(None, 50)
+        self._main = tk.Tk()
+        
 
     def run(self):
         self.mainPanel()
 
     def mainPanel(self):
         self._main.title("Main")
-        mazeButton = Button(self._main, text="Maze", command=self.mazePanel)
-        quitButton = Button(self._main, text="Quit", command=self._main.destroy)
+        mazeButton = tk.Button(self._main, text="Maze", command=self.mazePanel)
+        helpButton = tk.Button(self._main, text="Help")#, command=self.helpPanel)
+        quitButton = tk.Button(self._main, text="Quit", command=self._main.destroy)
         mazeButton.place(x=0, y=0)
+        quitButton.pack()
         self._main.mainloop()
 
     def mazePanel(self):
-        mazeScreen = display.set_mode((1080, 720))
+        mazeScreen = pygame.display.set_mode((1080, 720))
         mazeScreen.fill((255,255,255))
-        #quitButton = 
-        display.flip()
+        quitButton = pygame.draw.rect(mazeScreen, (0,0,0), (0,0,100,50))
+        font = pygame.font.Font(None, 50)
+        text = font.render("Quit", True, (0,0,255))
+        mazeScreen.blit(text, text.get_rect(center=quitButton.center))
+        pygame.display.update()
         running = True
         while running:
-            for event in event.get():
-                if event.type == QUIT:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
                     running = False
                     break
-                
-    def onEvent():
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    mouse = pygame.mouse.get_pos()
+                    if mouse[0] < 100 and mouse[1] < 50:
+                        running = False
+                        break
+        pygame.quit()
 
+    def createMaze(self):
+        print(self._mazeMap)
 
     def changeStart(self):
         ...
