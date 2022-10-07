@@ -1,7 +1,11 @@
 import random
 from Ui import *
+<<<<<<< HEAD
 from pyamaze import maze,COLOR
 from collections import deque
+=======
+
+>>>>>>> 43689843806ab33a19e1308529953c9e2ac0fc81
 class MazeGen:
     def __init__(self):
         self._mazeMap = {}
@@ -27,9 +31,14 @@ class MazeGen:
         print(self._grid)
         self.startPos(edgeList[0])
         self.endPos(edgeList[1])
+<<<<<<< HEAD
         m = maze(height,width)
         m.CreateMaze()
         m.run()
+=======
+        
+        
+>>>>>>> 43689843806ab33a19e1308529953c9e2ac0fc81
 
     def setMazeMap(self, newMazeMap:dict) -> dict:
         self._mazeMap = newMazeMap
@@ -40,7 +49,6 @@ class MazeGen:
 
     def pickEdge(self, width:int, height:int) -> list:
         edge = random.randint(1,4)
-        print(edge)
         if edge == 1: #North
             #Start Coord
             startCoord = [random.randint(1, width),1]
@@ -73,23 +81,24 @@ class MazeGen:
 
     #This will pick the starting point for the maze
     def startPos(self, edgeCoord:list) -> dict:
-        print(edgeCoord)
+        #print(edgeCoord)
         self.changeCellType(edgeCoord[0], edgeCoord[1], 2)
         return self._mazeMap
         
-   
+    @property
     def getStartPos(self):
         return self.startPos()
     
     #This will pick the end point for maze
     def endPos(self, edgeCoord:list) -> dict:
-        print(edgeCoord)
+        #print(edgeCoord)
         self.changeCellType(edgeCoord[0], edgeCoord[1], 3)
         return self._mazeMap  
     
     #Algorithm to generate a random path
-    def randomPathGen():
-        ...
+    def randomPathGen(self):
+        direction = random.choice(self._Compass)
+        return direction
 
     #Finds the next move of the random maze generator
     def findNextMove():
@@ -112,6 +121,9 @@ class MazeGen:
         ...
 
     def delNorth(self,x:int,y:int):
+        '''
+        Checks for a wall on the coords inputed and with change that wall type into a 0 denoting that the wall is removed
+        '''
         self._mazeMap[x,y]["N"] = 0
         try:
             if self._mazeMap[x,y-1]["S"] > 0:
@@ -177,11 +189,29 @@ class MazeGen:
         '''
         self._mazeMap[x,y]["Type"] = newCellType
 
+<<<<<<< HEAD
 
 class BFS(MazeGen):
     def __init__(self):
         super().__init__()
         self._lastSolvedLine = 0
+=======
+class BFS(MazeGen):
+    def __init__(self):
+        super().__init__()
+        self._stack = [MazeGen.getStartPos]
+        self._visited = []
+
+    def run(self):
+        self.getStack()
+
+    def nextCell(self):
+        ...
+
+    @property
+    def getStack(self):
+        return self._stack
+>>>>>>> 43689843806ab33a19e1308529953c9e2ac0fc81
 
 
 class HuntAndKill(MazeGen):

@@ -31,6 +31,7 @@ class Terminal(Ui):
 class GUI(Ui):
     def __init__(self):
         super().__init__()
+<<<<<<< HEAD
         self._LabWidth = 26
         self._win = Tk()
         self._win.state('zoomed')
@@ -40,6 +41,12 @@ class GUI(Ui):
         self._win.geometry(f"{scr_width}x{scr_height}+0+0")
         self._canvas = Canvas(width=scr_width, height=scr_height) 
         self._canvas.pack(expand=YES, fill=BOTH)
+=======
+        self._win=Tk()
+        self._win.state('zoomed')
+        self._win.title('Maze')
+        self._canvas = Canvas()
+>>>>>>> 43689843806ab33a19e1308529953c9e2ac0fc81
 
     def run(self):
         self._win.mainloop()

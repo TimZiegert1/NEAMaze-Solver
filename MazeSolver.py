@@ -8,6 +8,7 @@ g : play with the GUI
 t : play with the Terminal""")
     quit()
 
+#Runs the program
 if __name__ == "__main__":
     if len(argv) != 2:
         usage()
