@@ -1,6 +1,7 @@
 from generator import *
 from tkinter import *
-
+from generator import *
+from pygame import *
 class Ui:
     def __init__(self):
         self._gen = MazeGen()
@@ -31,25 +32,32 @@ class Terminal(Ui):
 class GUI(Ui):
     def __init__(self):
         super().__init__()
-<<<<<<< HEAD
-        self._LabWidth = 26
-        self._win = Tk()
-        self._win.state('zoomed')
-        self._win.title("Maze")
-        scr_width=self._win.winfo_screenwidth()
-        scr_height=self._win.winfo_screenheight()
-        self._win.geometry(f"{scr_width}x{scr_height}+0+0")
-        self._canvas = Canvas(width=scr_width, height=scr_height) 
-        self._canvas.pack(expand=YES, fill=BOTH)
-=======
-        self._win=Tk()
-        self._win.state('zoomed')
-        self._win.title('Maze')
-        self._canvas = Canvas()
->>>>>>> 43689843806ab33a19e1308529953c9e2ac0fc81
+        self._main = Tk()
 
     def run(self):
-        self._win.mainloop()
+        self.mainPanel()
+
+    def mainPanel(self):
+        self._main.title("Main")
+        mazeButton = Button(self._main, text="Maze", command=self.mazePanel)
+        quitButton = Button(self._main, text="Quit", command=self._main.destroy)
+        mazeButton.place(x=0, y=0)
+        self._main.mainloop()
+
+    def mazePanel(self):
+        mazeScreen = display.set_mode((1080, 720))
+        mazeScreen.fill((255,255,255))
+        #quitButton = 
+        display.flip()
+        running = True
+        while running:
+            for event in event.get():
+                if event.type == QUIT:
+                    running = False
+                    break
+                
+    def onEvent():
+
 
     def changeStart(self):
         ...

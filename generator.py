@@ -1,11 +1,4 @@
 import random
-from Ui import *
-<<<<<<< HEAD
-from pyamaze import maze,COLOR
-from collections import deque
-=======
-
->>>>>>> 43689843806ab33a19e1308529953c9e2ac0fc81
 class MazeGen:
     def __init__(self):
         self._mazeMap = {}
@@ -31,14 +24,6 @@ class MazeGen:
         print(self._grid)
         self.startPos(edgeList[0])
         self.endPos(edgeList[1])
-<<<<<<< HEAD
-        m = maze(height,width)
-        m.CreateMaze()
-        m.run()
-=======
-        
-        
->>>>>>> 43689843806ab33a19e1308529953c9e2ac0fc81
 
     def setMazeMap(self, newMazeMap:dict) -> dict:
         self._mazeMap = newMazeMap
@@ -189,13 +174,6 @@ class MazeGen:
         '''
         self._mazeMap[x,y]["Type"] = newCellType
 
-<<<<<<< HEAD
-
-class BFS(MazeGen):
-    def __init__(self):
-        super().__init__()
-        self._lastSolvedLine = 0
-=======
 class BFS(MazeGen):
     def __init__(self):
         super().__init__()
@@ -211,8 +189,6 @@ class BFS(MazeGen):
     @property
     def getStack(self):
         return self._stack
->>>>>>> 43689843806ab33a19e1308529953c9e2ac0fc81
-
 
 class HuntAndKill(MazeGen):
     def __init__(self):
