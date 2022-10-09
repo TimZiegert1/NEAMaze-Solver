@@ -6,16 +6,15 @@ class Ui:
         self._gen = MazeGen()
         self._height = int(input("Please enter the height of the maze: "))
         self._width = int(input("Please enter the width of the maze: "))
+        self._gen.genMaze(self._height, self._width)
 
 class Terminal(Ui):
     def __init__(self):
         super().__init__()  
 
     def run(self):
-        self._gen.genMaze(self._height, self._width)
         self._gen.getMazeMap()
-        #self._gen.printMaze()
-        self._gen.printMaze()
+
     def changeHeight(self, newWidth):
         self._width = newWidth
     
@@ -33,8 +32,9 @@ class GUI(Ui):
         super().__init__()
         pygame.init()
         self._mazeMap = self._gen.getMazeMap()
-        #self._font = pygame.font.Font(None, 50)
+        self._font = pygame.font.Font(None, 50)
         self._main = tk.Tk()
+        self._mazeScreen = pygame.display.set_mode((1080, 720), flags=pygame.HIDDEN)
         
 
     def run(self):
@@ -50,13 +50,14 @@ class GUI(Ui):
         self._main.mainloop()
 
     def mazePanel(self):
-        mazeScreen = pygame.display.set_mode((1080, 720))
-        mazeScreen.fill((255,255,255))
-        quitButton = pygame.draw.rect(mazeScreen, (0,0,0), (0,0,100,50))
-        font = pygame.font.Font(None, 50)
-        text = font.render("Quit", True, (0,0,255))
-        mazeScreen.blit(text, text.get_rect(center=quitButton.center))
+        self._mazeScreen = pygame.display.set_mode((1080, 720), flags=pygame.SHOWN)
+        self._mazeScreen.fill((255,255,255))
+        quitButton = pygame.draw.rect(self._mazeScreen, (0,0,0), (980,670,100,50))
+        text = self._font.render("Quit", True, (0,0,255))
+        self._mazeScreen.blit(text, text.get_rect(center=quitButton.center))
+        #self._gen.delNorth(1,3)
         pygame.display.update()
+        self.createMaze(self._mazeMap)
         running = True
         while running:
             for event in pygame.event.get():
@@ -65,13 +66,33 @@ class GUI(Ui):
                     break
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     mouse = pygame.mouse.get_pos()
-                    if mouse[0] < 100 and mouse[1] < 50:
+                    if mouse[0] > 980 and mouse[1] > 670:
                         running = False
                         break
         pygame.quit()
+        #This line allows to close and reopen the window
+        #self._mazeScreen = pygame.display.set_mode((1080, 720), flags=pygame.HIDDEN)
 
-    def createMaze(self):
-        print(self._mazeMap)
+    def createMaze(self, mazeMap):
+        y=-1
+        for _ in range(self._height): # height
+            x = 0
+            y += 1
+            for _ in range(self._width): # widths
+                pygame.draw.rect(self._mazeScreen, (255,255,255), ((x*55)+10,(y*55)+10,50,50))
+                if mazeMap[x+1,y+1]["N"] == 1:
+                    pygame.draw.rect(self._mazeScreen, (0,0,0), ((x*55)+5,((y*50)+(y-1)*5)+10,60,5))
+                if mazeMap[x+1,y+1]["S"] == 1:
+                    pygame.draw.rect(self._mazeScreen, (0,0,0), ((x*55)+10,((y*50)+(y-1)*5)+65,55,5))
+                if mazeMap[x+1,y+1]["E"] == 1:
+                    pygame.draw.rect(self._mazeScreen, (0,0,0), (((x*50)+(x-1)*5)+65,(y*55)+10,5,55))
+                if mazeMap[x+1,y+1]["W"] == 1:
+                    pygame.draw.rect(self._mazeScreen, (0,0,0), (((x*50)+(x-1)*5)+10,(y*55)+10,5,55))
+                pygame.display.update()
+                x += 1  
+        print(mazeMap)
+    
+
 
     def changeStart(self):
         ...

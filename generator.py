@@ -2,7 +2,6 @@ import random
 class MazeGen:
     def __init__(self):
         self._mazeMap = {}
-        
         self._Compass = ["N", "E", "S", "W"]
 
 
@@ -21,7 +20,6 @@ class MazeGen:
                 self._mazeMap[x,y]={'N':1,'E':1,'S':1,'W':1,'Type':0}
                 x += 1  
         edgeList = self.pickEdge(width, height)
-        print(self._grid)
         self.startPos(edgeList[0])
         self.endPos(edgeList[1])
 
@@ -29,8 +27,10 @@ class MazeGen:
         self._mazeMap = newMazeMap
 
     def getMazeMap(self) -> dict:
-        print(self._mazeMap)
         return self._mazeMap
+    
+    def getMazeMapCoord(self):
+        return
 
     def pickEdge(self, width:int, height:int) -> list:
         edge = random.randint(1,4)
@@ -146,21 +146,6 @@ class MazeGen:
             pass
         if self._mazeMap[x-1,y]["S"] > 0:
             self._mazeMap[x-1,y]["S"] = 0
-    
-    def delEast(self,x:int,y:int):
-        self._mazeMap[x,y]["E"] = 0
-        if self._mazeMap[x,y+1]["W"] > 0:
-            self._mazeMap[x,y+1]["W"] = 0   
-
-    def delSouth(self,x:int,y:int):
-        self._mazeMap[x,y]["S"] = 0
-        if self._mazeMap[x+1,y]["N"] > 0:
-            self._mazeMap[x+1,y]["N"] = 0
-
-    def delWest(self,x:int,y:int):
-        self._mazeMap[x,y]["W"] = 0
-        if self._mazeMap[x,y-1]["E"] > 0:
-            self._mazeMap[x,y-1]["E"] = 0
 
     def getCellType(self,x:int,y:int) -> int:
         '''
