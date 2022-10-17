@@ -9,14 +9,7 @@ class Ui:
         self._width = int(input("Please enter the width of the maze: "))
         self._gen.genMaze(self._height, self._width)
 
-class Terminal(Ui):
-    def __init__(self):
-        super().__init__()  
-
-    def run(self):
-        self._gen.getMazeMap()
-
-    def changeHeight(self, newWidth):
+    def changeWidth(self, newWidth):
         self._width = newWidth
     
     def getWidth(self):
@@ -28,6 +21,13 @@ class Terminal(Ui):
     def getHeight(self):
         return self._height
 
+
+class Terminal(Ui):
+    def __init__(self):
+        super().__init__()  
+
+    def run(self):
+        self._gen.getMazeMap()
 class GUI(Ui):
     def __init__(self):
         super().__init__()
@@ -64,8 +64,9 @@ class GUI(Ui):
         self._mazeScreen.blit(quitText, quitText.get_rect(center=quitButton.center))
         runText = self._font.render("Run", True, (255,0,0))
         self._mazeScreen.blit(runText, runText.get_rect(center=runButton.center))
+        self._gen.delNorth(2,2)
         #self._gen.findNextMove(self._gen.startPoint[0], self._gen.startPoint[1])
-        self.createMaze(self._mazeMap)
+        self.drawMaze(self._mazeMap)
         pygame.display.update()
         running = True
         while running:
@@ -83,12 +84,12 @@ class GUI(Ui):
                     if mouse[0] > 980 and mouse[1] > 570 and mouse[1] < 620 and mouse[0] < 1080:
                         #self._gen.findNextMove(self._gen.startPoint[0], self._gen.startPoint[1])
                         self._RDFS.solve(self._gen.getMazeMap, self._gen.startPoint[0], self._gen.startPoint[1])
-                        self.createMaze(self.getMazeMap)
+                        self.drawMaze(self.getMazeMap)
         pygame.quit()
         #This line allows to close and reopen the window
         #self._mazeScreen = pygame.display.set_mode((1080, 720), flags=pygame.HIDDEN)
 
-    def createMaze(self, mazeMap):
+    def drawMaze(self, mazeMap):
         y=-1
         for _ in range(self._height): # height
             x = 0
@@ -102,7 +103,7 @@ class GUI(Ui):
                 #elif mazeMap[x+1,y+1]["Type"] == 1:
                     #pygame.draw.rect(self._mazeScreen, (50,50,50), ((x*55)+10,(y*55)+10,50,50))
                 if mazeMap[x+1,y+1]["N"] == 1:
-                    pygame.draw.rect(self._mazeScreen, (0,0,0), ((x*55)+5,((y*50)+(y-1)*5)+10,60,5))
+                    pygame.draw.rect(self._mazeScreen, (0,0,0), ((x*55)+5,((y*50)+(y-1)*5)+10,65,5))
                 if mazeMap[x+1,y+1]["S"] == 1:
                     pygame.draw.rect(self._mazeScreen, (0,0,0), ((x*55)+10,((y*50)+(y-1)*5)+65,55,5))
                 if mazeMap[x+1,y+1]["E"] == 1:
@@ -110,7 +111,7 @@ class GUI(Ui):
                 if mazeMap[x+1,y+1]["W"] == 1:
                     pygame.draw.rect(self._mazeScreen, (0,0,0), (((x*50)+(x-1)*5)+10,(y*55)+10,5,55))
                 if mazeMap[x+1,y+1]["N"] == 0:
-                    pygame.draw.rect(self._mazeScreen, (255,255,255), ((x*55)+5,((y*50)+(y-1)*5)+10,60,5))
+                    pygame.draw.rect(self._mazeScreen, (255,255,255), ((x*55)+5,((y*50)+(y-1)*5)+10,65,5))
                 if mazeMap[x+1,y+1]["S"] == 0:
                     pygame.draw.rect(self._mazeScreen, (255,255,255), ((x*55)+10,((y*50)+(y-1)*5)+65,55,5))
                 if mazeMap[x+1,y+1]["E"] == 0:
@@ -121,7 +122,11 @@ class GUI(Ui):
                 pygame.display.update()
                 x += 1  
     
+    def pickGen(self):
+        ... #Drop down of all maze Generation algorithms
 
+    def pickSolve(self):
+        ... #Drop down of all maze solving algorithms
 
     def changeStart(self):
         ...
@@ -140,6 +145,18 @@ class GUI(Ui):
 
     def settingsButton(self):
         ...
+
+    def resetButton(self):
+        ...
+    
+    def stepForwardButton(self):
+        ...
+    
+    def stepBackwardButton(self):
+        ...
+
+    def pauseButton(self):
+        ...
     
     def importMaze(self):
         ...
@@ -147,29 +164,12 @@ class GUI(Ui):
     def saveMaze(self):
         ...
 
-    def stepButtonForward(self):
-        ...
-    
-    def stepButtonBackward(self):
-        ...
-
-    def pauseButton(self):
-        ...
-
-    def widthChanger(self):
+    def widthUpdate(self):
         ... #Both slider and textbox
     
-    def heightChaner(self):
+    def heightUpdate(self):
         ... #Both slider and textbox
 
-    def pickGen(self):
-        ... #Drop down of all maze Generation algorithms
-
-    def pickSolve(self):
-        ... #Drop down of all maze solving algorithms
-
-    def resetButton(self):
-        ...
 
     def speedSlider(self):
         ... #Text box or slider
