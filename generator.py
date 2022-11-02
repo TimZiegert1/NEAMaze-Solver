@@ -6,7 +6,8 @@ class MazeGen:
         self._mazeMap = {}
         self._compass = ["N", "E", "S", "W"]
         self._dimentions = []
-
+        self._startPos = []
+        self._endPos = []
 
     def genMaze(self, height:int=10, width:int=10) -> dict: 
         '''
@@ -73,8 +74,9 @@ class MazeGen:
         '''
         This sets the start point type
         '''
-        self.startPoint = edgeCoord
-        #print(edgeCoord)
+        self._startPos = [edgeCoord[0], edgeCoord[1]]
+        print(self._startPos)
+        print(f"Start Point: {edgeCoord}")
         self.changeCellType(edgeCoord[0], edgeCoord[1], 2)
         return self._mazeMap
 
@@ -82,17 +84,18 @@ class MazeGen:
         '''
         This sets the end point type
         '''
-        self.endPoint = edgeCoord
-        #print(edgeCoord)
+        self._endPos = [edgeCoord[0], edgeCoord[1]]
+        print(f"End Point: {edgeCoord}")
         self.changeCellType(edgeCoord[0], edgeCoord[1], 3)
         return self._mazeMap  
 
-    
+    @property 
     def getStartPos(self) -> list:
-        return self.pickEdge[0]
-    
+        print(self._startPos)
+        return self._startPos
+    @property
     def getEndPos(self) -> list:
-        return self.pickEdge[1]
+        return self._endPos
 
     #Algorithm to generate a random path
     def randomPathGen(self):
@@ -188,16 +191,16 @@ class MazeGen:
             nextMove = random.choice(self.checkNeighCells(x,y))
             print(nextMove)
             if nextMove[1] < y: 
-                print(x,y-1)
+                print("N",x,y-1)
                 return ("N", x, y-1)
             if nextMove[0] > x: 
-                print(x+1,y)
+                print("W",x+1,y)
                 return ("W", x+1, y)
             if nextMove[1] > y: 
-                print(x,y+1)
+                print("S",x,y+1)
                 return ("S",x, y+1)
             if nextMove[0] < x: 
-                print(x-1,y)
+                print("E",x-1,y)
                 return ("E",x-1, y)
             #As there are no possible moves the maze generator will need to backtrack
             
@@ -206,12 +209,15 @@ class MazeGen:
 class RDFS(MazeGen):
     def __init__(self):
         super().__init__()
-        self._stack = []
+        self._stack = [self.getStartPos]
+        
 
     def run(self):
         self.solve()
     
     def solve(self, mazeGen, x:int, y:int):
+        self._stack.append(self.getStartPos)
+        print(self._stack)
         self._mazeMap = mazeGen
         self._stack.append(self.findNextMove(x,y))
         if self._stack[0][0] == "S":
