@@ -4,7 +4,7 @@ import pygame
 class Ui:
     def __init__(self):
         self._gen = MazeGen()
-        self._RDFS = RDFS()
+        self._Gen = Gen()
         self._height = int(input("Please enter the height of the maze: "))
         self._width = int(input("Please enter the width of the maze: "))
         self._gen.genMaze(self._height, self._width)
@@ -27,7 +27,7 @@ class Terminal(Ui):
         super().__init__()  
 
     def run(self):
-        self._gen.getMazeMap()
+        self._gen.genMaze()
 class GUI(Ui):
     def __init__(self):
         super().__init__()
@@ -64,7 +64,6 @@ class GUI(Ui):
         self._mazeScreen.blit(quitText, quitText.get_rect(center=quitButton.center))
         runText = self._font.render("Run", True, (255,0,0))
         self._mazeScreen.blit(runText, runText.get_rect(center=runButton.center))
-        #self._gen.findNextMove(self._gen.startPoint[0], self._gen.startPoint[1])
         self.drawMaze(self._mazeMap)
         pygame.display.update()
         running = True
@@ -82,7 +81,7 @@ class GUI(Ui):
                     mouse = pygame.mouse.get_pos()
                     if mouse[0] > 980 and mouse[1] > 570 and mouse[1] < 620 and mouse[0] < 1080:
                         #self._gen.findNextMove(self._gen.startPoint[0], self._gen.startPoint[1])
-                        self._RDFS.solve(self._gen.getMazeMap, self._gen.getStartPos[0], self._gen.getStartPos[1])
+                        self._Gen.solve(self._gen.getMazeMap, self._gen.getStartPos[0], self._gen.getStartPos[1])
                         self.drawMaze(self.getMazeMap)
         pygame.quit()
         #This line allows to close and reopen the window
@@ -94,7 +93,7 @@ class GUI(Ui):
             x = 0
             y += 1
             for _ in range(self._width): # widths
-                pygame.draw.rect(self._mazeScreen, (255,255,255), ((x*55)+10,(y*55)+10,50,50))
+                #pygame.draw.rect(self._mazeScreen, (255,255,255), ((x*55)+10,(y*55)+10,50,50))
                 if mazeMap[x+1,y+1]["Type"] == 2:
                     pygame.draw.rect(self._mazeScreen, (255,0,0), ((x*55)+10,(y*55)+10,50,50))
                 elif mazeMap[x+1,y+1]["Type"] == 3:
@@ -104,19 +103,19 @@ class GUI(Ui):
                 if mazeMap[x+1,y+1]["N"] == 1:
                     pygame.draw.rect(self._mazeScreen, (0,0,0), ((x*55)+5,((y*50)+(y-1)*5)+10,60,5))
                 if mazeMap[x+1,y+1]["S"] == 1:
-                    pygame.draw.rect(self._mazeScreen, (0,0,0), ((x*55)+10,((y*50)+(y-1)*5)+65,55,5))
+                    pygame.draw.rect(self._mazeScreen, (0,0,0), ((x*55)+5,((y*50)+(y-1)*5)+65,60,5))
                 if mazeMap[x+1,y+1]["E"] == 1:
-                    pygame.draw.rect(self._mazeScreen, (0,0,0), (((x*50)+(x-1)*5)+65,(y*55)+10,5,55))
+                    pygame.draw.rect(self._mazeScreen, (0,0,0), (((x*50)+(x-1)*5)+65,(y*55)+5,5,60))
                 if mazeMap[x+1,y+1]["W"] == 1:
-                    pygame.draw.rect(self._mazeScreen, (0,0,0), (((x*50)+(x-1)*5)+10,(y*55)+10,5,55))
+                    pygame.draw.rect(self._mazeScreen, (0,0,0), (((x*50)+(x-1)*5)+10,(y*55)+5,5,60))
                 if mazeMap[x+1,y+1]["N"] == 0:
-                    pygame.draw.rect(self._mazeScreen, (255,255,255), ((x*55)+5,((y*50)+(y-1)*5)+10,60,5))
+                    pygame.draw.rect(self._mazeScreen, (255,255,255), ((x*55)+10,((y*50)+(y-1)*5)+10,50,5))
                 if mazeMap[x+1,y+1]["S"] == 0:
-                    pygame.draw.rect(self._mazeScreen, (255,255,255), ((x*55)+10,((y*50)+(y-1)*5)+65,55,5))
+                    pygame.draw.rect(self._mazeScreen, (255,255,255), ((x*55)+10,((y*50)+(y-1)*5)+65,50,5))
                 if mazeMap[x+1,y+1]["E"] == 0:
-                    pygame.draw.rect(self._mazeScreen, (255,255,255), (((x*50)+(x-1)*5)+65,(y*55)+10,5,55))
+                    pygame.draw.rect(self._mazeScreen, (255,255,255), (((x*50)+(x-1)*5)+65,(y*55)+10,5,50))
                 if mazeMap[x+1,y+1]["W"] == 0:
-                    pygame.draw.rect(self._mazeScreen, (255,255,255), (((x*50)+(x-1)*5)+10,(y*55)+10,5,55))
+                    pygame.draw.rect(self._mazeScreen, (255,255,255), (((x*50)+(x-1)*5)+10,(y*55)+10,5,50)) 
 
                 pygame.display.update()
                 x += 1  

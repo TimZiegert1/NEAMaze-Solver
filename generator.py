@@ -75,7 +75,6 @@ class MazeGen:
         This sets the start point type
         '''
         self._startPos = [edgeCoord[0], edgeCoord[1]]
-        print(self._startPos)
         print(f"Start Point: {edgeCoord}")
         self.changeCellType(edgeCoord[0], edgeCoord[1], 2)
         return self._mazeMap
@@ -86,12 +85,11 @@ class MazeGen:
         '''
         self._endPos = [edgeCoord[0], edgeCoord[1]]
         print(f"End Point: {edgeCoord}")
-        self.changeCellType(edgeCoord[0], edgeCoord[1], 3)
+        self.changeCellType(edgeCoord[0], edgeCoord[1], 3) #if removed then maze can be fully generated
         return self._mazeMap  
 
     @property 
     def getStartPos(self) -> list:
-        print(self._startPos)
         return self._startPos
     @property
     def getEndPos(self) -> list:
@@ -189,48 +187,68 @@ class MazeGen:
             return "Dead End"
         else:
             nextMove = random.choice(self.checkNeighCells(x,y))
-            print(nextMove)
             if nextMove[1] < y: 
-                print("N",x,y-1)
-                return ("N", x, y-1)
+                return ("S", x, y-1)
             if nextMove[0] > x: 
-                print("W",x+1,y)
                 return ("W", x+1, y)
             if nextMove[1] > y: 
-                print("S",x,y+1)
-                return ("S",x, y+1)
+                return ("N",x, y+1)
             if nextMove[0] < x: 
-                print("E",x-1,y)
                 return ("E",x-1, y)
             #As there are no possible moves the maze generator will need to backtrack
             
 
-
-class RDFS(MazeGen):
+#READ THIS, TURN THIS INTO HUNT AND KILL ALGORITHM LATER
+class Gen(MazeGen):
     def __init__(self):
         super().__init__()
-        self._stack = [self.getStartPos]
+        self._count = 0
+        self._stack = []
+        #self._mazeMap = self.getMazeMap
         
 
     def run(self):
-        self.solve()
-    
+        #print(self._mazeMap)
+        self.solve() 
+
+    #Change to -1 as it is a stack
+    def deadEnd(self):
+        self._stack.pop()
+        if self.findNextMove(self._stack[-1][1], self._stack[-1][2]) == "Dead End":
+            print(f"DeadEnd: {self._count}")
+            print(self._stack)
+            self.deadEnd()
+
     def solve(self, mazeGen, x:int, y:int):
-        self._stack.append(self.getStartPos)
-        print(self._stack)
+        #self._stack.append(self.getStartPos)
         self._mazeMap = mazeGen
         self._stack.append(self.findNextMove(x,y))
-        if self._stack[0][0] == "S":
-            self.delSouth(self._stack[0][1],self._stack[0][2])
-        elif self._stack[0][0] == "W":
-            self.delWest(self._stack[0][1],self._stack[0][2])
-        elif self._stack[0][0] == "E":
-            self.delEast(self._stack[0][1],self._stack[0][2])
-        elif self._stack[0][0] == "N":
-            self.delNorth(self._stack[0][1],self._stack[0][2])
-        
-
-
+        if self._stack[-1][0] == "S":
+            self.delSouth(self._stack[-1][1],self._stack[-1][2])
+        elif self._stack[-1][0] == "W":
+            self.delWest(self._stack[-1][1],self._stack[-1][2])
+        elif self._stack[-1][0] == "E":
+            self.delEast(self._stack[-1][1],self._stack[-1][2])
+        elif self._stack[-1][0] == "N":
+            self.delNorth(self._stack[-1][1],self._stack[-1][2])
+        elif self._stack[-1] == "Dead End":
+            self.deadEnd()     
+        self.changeCellType(x,y,1)
+        try:
+            if self._stack[-1] != "Dead End":
+                self._count += 1 
+                self.solve(self._mazeMap, self._stack[-1][1], self._stack[-1][2])       
+        except IndexError:
+            pass
+class RDFS(MazeGen):
+    def __init__(self):
+        super().__init__()
+        self._count = 0
+        self._stack = []
+        #self._mazeMap = self.getMazeMap
+    
+    def run(self):
+        ...
 
 class BFS(MazeGen):
     def __init__(self):
