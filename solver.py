@@ -1,12 +1,12 @@
 from generator import *
 import random
 from queue import PriorityQueue
-class Solver():
-    def __init__(self):
-        #self._mazeMap = mazeMap
-        #self._x = x
-        #self._y = y
-        ...
+class Solver:
+    def __init__(self, mazeMap:dict, startPos:list, endPos:list, mazeGen):
+        self._mazeMap = mazeMap
+        self._startPos = startPos
+        self._endPos = endPos
+        self._mazeGen = mazeGen
 
     def checkIsEnd(self, x:int, y:int) -> str:
         try:
@@ -56,20 +56,19 @@ class Solver():
         DFS().run()
 
 class DFS(Solver):
-    def __init__(self):
-        super().__init__()
+    def __init__(self, mazeMap, startPos, endPos, mazeGen):
+        super().__init__(mazeMap, startPos, endPos, mazeGen)
         self._stack = []
     
     def run(self):
-        self.solve()
+        self.solve(self._startPos[0], self._startPos[1])
 
     def deadEnd(self):
         self._stack.pop()
         if self.findNextMove(self._stack[-1][0], self._stack[-1][1]) == "DeadEnd":
             self.deadEnd()
 
-    def solve(self, mazeMap, x:int, y:int):
-        self._mazeMap = mazeMap
+    def solve(self, x:int, y:int):
         if self.checkIsEnd(x, y) == "End":
             print(self._stack)
             print("Solved")
@@ -87,7 +86,7 @@ class DFS(Solver):
         except:
             print("Dont hit solve twice")
         try:
-            self.solve(self._mazeMap, self._stack[-1][0], self._stack[-1][1])
+            self.solve(self._stack[-1][0], self._stack[-1][1])
         except IndexError:
             pass
 
