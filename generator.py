@@ -4,11 +4,11 @@ import sys
 
 #sys.setrecursionlimit(100)
 class Generator:
-    def __init__(self, mazeMap:dict, startPos:list, endPos:list, mazeGen):
-        self._mazeGen = mazeGen
-        self._mazeMap = mazeMap
-        self._startPos = startPos
-        self._endPos = endPos
+    def __init__(self, mazeGen:MazeGen):
+        self._maze = mazeGen
+        self._mazeMap = self._maze.getMazeMap
+        self._startPos = self._maze.getStartPos
+        self._endPos = self._maze.getEndPos
         self._compass = ["N", "E", "S", "W"]
 
     #Algorithm to generate a random path
@@ -128,16 +128,14 @@ class Generator:
 ##############################################################
 
 class RDFS(Generator):
-    def __init__(self, mazeMap,startPos, endPos, mazeGen):
-        super().__init__(mazeMap, startPos, endPos, mazeGen)
+    def __init__(self, mazeGen):
+        super().__init__(mazeGen)
         self._stack = []
 
     def run(self):
         #print(self._mazeGen.getEndPos, self._mazeGen.getStartPos)
-        print(self._mazeGen.getEndPos[0], self._mazeGen.getEndPos[1])
-        print(self._mazeMap[self._mazeGen.getEndPos[0], self._mazeGen.getEndPos[1]])
-        self.changeCellType(self._mazeGen.getEndPos[0], self._mazeGen.getEndPos[1], 0)
-        self.generate(self._mazeGen.getStartPos[0], self._mazeGen.getStartPos[1])
+        self.changeCellType(self._maze.getEndPos[0], self._maze.getEndPos[1], 0)
+        self.generate(self._maze.getStartPos[0], self._maze.getStartPos[1])
 
     #Change to -1 as it is a stack
     def deadEnd(self):
@@ -171,9 +169,9 @@ class RDFS(Generator):
         try:
             self.generate(self._stack[-1][1], self._stack[-1][2])       
         except IndexError:
-            self.changeCellType(self._mazeGen.getEndPos[0], self._mazeGen.getEndPos[1], 4)
-            #self._mazeGen.setMazeMap(self._mazeMap)
-            #print(self._mazeGen.getMazeMap)
+            self.changeCellType(self._maze.getEndPos[0], self._maze.getEndPos[1], 4)
+            tempMaze = self._mazeMap.copy()
+            self._maze.setTempMaze(tempMaze)
             print("Generated Maze")
 
 class BFS(Generator):

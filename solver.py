@@ -2,11 +2,11 @@ from generator import *
 import random
 from queue import PriorityQueue
 class Solver:
-    def __init__(self, mazeMap:dict, startPos:list, endPos:list, mazeGen):
-        self._mazeMap = mazeMap
-        self._startPos = startPos
-        self._endPos = endPos
-        self._mazeGen = mazeGen
+    def __init__(self, mazeGen:MazeGen):
+        self._maze = mazeGen
+        self._mazeMap = self._maze.getMazeMap
+        self._startPos = self._maze.getStartPos
+        self._endPos = self._maze.getEndPos
 
     def checkIsEnd(self, x:int, y:int) -> str:
         try:
@@ -56,8 +56,9 @@ class Solver:
         DFS().run()
 
 class DFS(Solver):
-    def __init__(self, mazeMap, startPos, endPos, mazeGen):
-        super().__init__(mazeMap, startPos, endPos, mazeGen)
+    def __init__(self, mazeGen):
+        super().__init__(mazeGen)
+        self._stackSearched = []
         self._stack = []
     
     def run(self):
@@ -70,12 +71,13 @@ class DFS(Solver):
 
     def solve(self, x:int, y:int):
         if self.checkIsEnd(x, y) == "End":
-            print(self._stack)
             print("Solved")
             self.setSolution()
             self._stack = []
             return "Solved"
         self._stack.append(self.findNextMove(x, y))
+        if self._stack[-1] != "DeadEnd":
+            self._stackSearched.append(self._stack[-1])
         try:
             if self._stack[-1] == "DeadEnd":
                 self.deadEnd()
@@ -92,77 +94,105 @@ class DFS(Solver):
 
     def setSolution(self):
         for cell in self._mazeMap:
-            self._mazeMap[cell[0], cell[1]]["Type"] = 1
+            self._mazeMap[cell[0], cell[1]]["Type"] = 0
+        for cell in self._stackSearched:
+            self._mazeMap[cell[0], cell[1]]["Type"] = 5
         for cell in self._stack:
             self._mazeMap[cell[0], cell[1]]["Type"] = 2
+        self._mazeMap[self._startPos[0], self._startPos[1]]["Type"] = 3
+        self._mazeMap[self._endPos[0], self._endPos[1]]["Type"] = 4
 
 
 class AStar(Solver):
-    def __init__(self):
-        super().__init__()
-        self._start = self._mazeGen.getStartPos
-        self._gScore= {cell: float("inf") for cell in self._mazeMap}
+    def __init__(self, mazeGen: MazeGen):
+        super().__init__(mazeGen)
+        #self._qSearch = []
+        self._start = tuple(self._startPos)
+        self._end = tuple(self._endPos)
+        self._searchPath = {}
+        self._solvePath = {}
+        self._gScore = {cell: float("inf") for cell in self._mazeMap}
+        self._fScore = {cell: float("inf") for cell in self._mazeMap}
+        self._pQueue = PriorityQueue()
+        self._pQueue.put((self.heuristic(self._start, self._end),self.heuristic(self._start, self._end), (self._start)))
         self._gScore[self._start] = 0
-        self._fScore= {cell: float("inf") for cell in self._mazeMap}
+        self._fScore[self._start] = self.heuristic(self._start, self._end)
     
-    def heuristic(self, x:int, y:int) -> int:
-        x1, y1 = x
-        x2, y2 = y
-        return abs(x1-x2) + abs(y1-y2)
-
     def run(self):
-        open= PriorityQueue()
-        open.put(self.heuristic(self._start,(1,1), self.heuristic(self._start, (1,1), self._start)))
-        closed = []
-        while not open.empty():
-            current = open.get()[2]
-            if current == self._mazeGen.getEndPos:
-                return "Solved"
-            closed.append(current)
-            for neighbour in self.checkNeighCells(current[0], current[1]):
-                if neighbour in closed:
-                    continue
-                tentative_gScore = self._gScore[current] + 1
-                if tentative_gScore >= self._gScore[neighbour]:
-                    continue
-                self._cameFrom[neighbour] = current
-                self._gScore[neighbour] = tentative_gScore
-                self._fScore[neighbour] = self._gScore[neighbour] + self.heuristic(neighbour, self._mazeGen.getEndPos)
-                if neighbour not in [i[2] for i in open.queue]:
-                    open.put((self._fScore[neighbour], neighbour))
-        return "No Solution"
+        self.algorithm()
 
+    def heuristic(self, cell1, cell2) -> int:
+        x1, y1 = cell1
+        x2, y2 = cell2
+        return abs(x1-x2) + abs(y1-y2)
+    
+    def algorithm(self):
+        currCell=self._pQueue.get()[2]
+        if self.checkIsEnd(currCell[0], currCell[1]) == "End":
+            self._searchPath[self._end] = currCell
+            print("Solved")
+            self.setSolution()
+            return "Solved"
+        for childCell in self.checkNeighCells(currCell[0], currCell[1]):
+            tempGScore = self._gScore[currCell] + 1
+            tempFScore = tempGScore + self.heuristic(childCell, self._end)
+            if tempFScore < self._fScore[childCell]:
+                self._searchPath[childCell] = currCell
+                self._gScore[childCell] = tempGScore
+                self._fScore[childCell] = tempGScore + self.heuristic(childCell, self._end)
+                self._pQueue.put((self._fScore[childCell], self.heuristic(childCell, self._end), childCell))
+        self.algorithm()
 
-    def algorithm():
-        ...
+    def setSolution(self):
+        cell = self._end
+        while cell != self._start:
+            self._solvePath[self._searchPath[cell]] = cell
+            cell = self._searchPath[cell]
+        for cell in self._searchPath:
+            self._mazeMap[cell[0], cell[1]]["Type"] = 5
+        for cell in self._solvePath:
+            self._mazeMap[cell[0], cell[1]]["Type"] = 2
+        self._mazeMap[self._startPos[0], self._startPos[1]]["Type"] = 3
+        self._mazeMap[self._endPos[0], self._endPos[1]]["Type"] = 4
+
 
 class BFS(Solver):
-    def __init__(self):
-        super().__init__()
-        self._queue = []
+    def __init__(self, mazeGen:MazeGen):
+        super().__init__(mazeGen)
+        self._start = tuple(self._startPos)
+        self._end = tuple(self._endPos)
+        self._front = [self._start]
+        self._searched = {}
+        self._solvePath = {}
     
     def run(self):
         self.solve()
-        #self._mazeGen._mazeMap = mazeMap
-    
-    def solve(self, mazeMap, x:int, y:int):
-        #Breadth first search algorithm
-        self._mazeMap = mazeMap
-        self._queue.append(self.findNextMove(x, y))
-        if self._queue[-1] == "DeadEnd":
-            self.deadEnd()
-        self._mazeMap[self._queue[-1][0], self._queue[-1][1]]["Type"] = 2
-        if self.findNextMove(self._queue[-1][0], self._queue[-1][1]) == "End":
-            print(self._queue)
+
+    def solve(self):
+        currCell = self._front.pop(0)
+        if self.checkIsEnd(currCell[0], currCell[1]) == "End":
+            self._searched[self._end] = currCell
             print("Solved")
+            self.setSolution()
             return "Solved"
-        try:
-            self.solve(self._mazeMap, self._queue[-1][0], self._queue[-1][1])
-        except IndexError:
-            print(self._queue)
-            print("ERROR")
-            pass
-        #self._mazeGen.changeCellType(self._stack[-1][0], self._stack[-1][1], 2)
+        for childCell in self.checkNeighCells(currCell[0], currCell[1]):
+            self._mazeMap[childCell[0], childCell[1]]["Type"] = 5
+            self._front.append(childCell)
+            self._searched[childCell] = currCell
+        self.solve()
+
+
+    def setSolution(self):
+        cell = self._end
+        while cell != self._start:
+            self._solvePath[self._searched[cell]] = cell
+            cell = self._searched[cell]
+        for cell in self._searched:
+            self._mazeMap[cell[0], cell[1]]["Type"] = 5
+        for cell in self._solvePath:
+            self._mazeMap[cell[0], cell[1]]["Type"] = 2
+        self._mazeMap[self._startPos[0], self._startPos[1]]["Type"] = 3
+        self._mazeMap[self._endPos[0], self._endPos[1]]["Type"] = 4
 
 class RHW(Solver):
     def __init__(self):
@@ -171,7 +201,6 @@ class RHW(Solver):
 
     def run(self):
         self.solve()
-        #self._mazeGen._mazeMap = mazeMap
 
     def deadEnd(self):
         self._stack.pop()
@@ -180,11 +209,5 @@ class RHW(Solver):
     
     def solve(self, mazeMap, x:int, y:int):
         #Follows the right hand side of the wall
-        self._mazeMap = mazeMap
-        self._stack.append(self.findNextMove(x, y))
-        if self._stack[-1] == "DeadEnd":
-            self.deadEnd()
-        self._mazeMap[self._stack[-1][0], self._stack[-1][1]]["Type"] = 2
         ...
 
-      

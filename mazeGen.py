@@ -7,6 +7,7 @@ class MazeGen():
         self.mazeMapReturn = self.genMaze()  
         self.mazeMap = self.mazeMapReturn[0]
         self.grid = self.mazeMapReturn[1]
+        self.tempMaze = {}
         self._dimentions = [self._height, self._width]
         self.__pickEdge = self.pickEdge()
         self.startPos = self.__pickEdge[0]
@@ -19,7 +20,6 @@ class MazeGen():
 #     CATEGORY A SKILL: COMPLEX DATA MODEL     #
 #                                              #
 ################################################
-
 
     def genMaze(self) -> dict: 
         '''
@@ -35,7 +35,7 @@ class MazeGen():
             for _ in range(self._width): # widths
                 self.grid.append((x,y))
                 self.mazeMap[x,y]={'N':1,'E':1,'S':1,'W':1,'Type':0}
-                x += 1  
+                x += 1
         return self.mazeMap, self.grid
 
     def setMazeMap(self, newMazeMap:dict) -> dict:
@@ -48,6 +48,13 @@ class MazeGen():
     @property
     def getGrid(self) -> list:
         return self.grid
+
+    def setTempMaze(self, newTempMaze:dict) -> dict:
+        self.tempMaze = newTempMaze
+
+    @property
+    def getTempMaze(self) -> dict:
+        return self.tempMaze
 
     def pickEdge(self) -> list:
         '''
@@ -110,3 +117,7 @@ class MazeGen():
     def getEndPos(self) -> list:
         #print(self._endPos)
         return self.endPos
+
+    @property
+    def getDimentions(self) -> list:
+        return self._dimentions
