@@ -238,7 +238,7 @@ class GUI(Ui):
     def drawMazeGen(self, mazeMap, path):
         ...
 
-    def drawMazeSolve(self, mazeMap, searchPath, solvePath, searchTime = 0.2, solveTime = 0.05):
+    def drawMazeSolve(self, mazeMap, searchPath, solvePath, searchTime = 0.1, solveTime = 0.05):
         count = 0
         for cell in searchPath:
             if count != 0:

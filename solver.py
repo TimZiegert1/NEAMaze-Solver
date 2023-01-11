@@ -90,6 +90,7 @@ class DFS(Solver):
             self._mazeMap[self._stack[-1][0], self._stack[-1][1]]["Type"] = 2
             #self._gui.drawMaze(self._mazeMap)
         except:
+            #THIS CAN CAUSE ERROR
             print("Dont hit solve twice")
         try:
             #time.sleep(0.5)

@@ -181,6 +181,7 @@ class RDFS(Generator):
         print(self._stackGen)
         return self._stackGen
 
+#NOT 100% WORKING CHECK ON IT
 class HuntAndKill(Generator):
     def __init__(self, mazeGen):
         super().__init__(mazeGen)
@@ -188,42 +189,83 @@ class HuntAndKill(Generator):
         self._lastSolvedLine = 1
 
     def run(self):
+        self.changeCellType(self._maze.getStartPos[0], self._maze.getStartPos[1], 0)
         self.changeCellType(self._maze.getEndPos[0], self._maze.getEndPos[1], 0)
         self.algorithm(self._maze.getStartPos[0], self._maze.getStartPos[1])
 
     def findHunt(self, x, y):
         neighCells = []
+        delNum = -1
         try:
-            if self._mazeMap[x,y+1]["Type"] == 1: neighCells.append((x,y+1))
+            if self._mazeMap[x,y+1]["Type"] == 1: 
+                #self.delSouth(x,y)
+                neighCells.append((x,y+1)) 
+                return "S"
         except KeyError: pass
             #This means that the cell is on the edge of the maze or has been visited
         try:
-            if self._mazeMap[x-1,y]["Type"] == 1: neighCells.append((x-1,y))
+            if self._mazeMap[x-1,y]["Type"] == 1: 
+                #self.delWest(x,y)
+                neighCells.append((x-1,y))
+                return "W"
         except KeyError:pass 
         try:
-            if self._mazeMap[x,y-1]["Type"] == 1: neighCells.append((x,y-1))
+            if self._mazeMap[x,y-1]["Type"] == 1: 
+                #self.delNorth(x,y)
+                neighCells.append((x,y-1))
+                return "N"
         except KeyError:pass
         try:
-            if self._mazeMap[x+1,y]["Type"] == 1: neighCells.append((x+1,y))
+            if self._mazeMap[x+1,y]["Type"] == 1: 
+                #self.delEast(x,y)
+                neighCells.append((x+1,y))
+                return "E"
         except KeyError:pass
         if len(neighCells) == 0: return "Dead End"
         return random.choice(neighCells)    
 
+    def checkLineSolved(self):
+        count = 0
+        for x in range(self._maze.getDimentions[1]):
+            if self._mazeMap[x+1, self._lastSolvedLine]["Type"] == 1: 
+                count += 1
+            if count == self._maze.getDimentions[1]:
+                self._lastSolvedLine += 1
+
     def deadEnd(self):
-        if self._lastSolvedLine <= self._maze.getDimentions[0]:
-            for x in range(self._maze.getDimentions[1]):
-                if self._mazeMap[x+1, self._lastSolvedLine]["Type"] == 0 and self.findHunt(x, self._lastSolvedLine) != "Dead End":
-                    self.algorithm(x+1, self._lastSolvedLine)
-                elif self._mazeMap[x+1, self._lastSolvedLine]["Type"] == 1 and x+1 == self._maze.getDimentions[1]:
-                    self._lastSolvedLine += 1
-                    self.deadEnd()
-        else:
-            print("ERROR THING")
+        self.checkLineSolved()
+        y = 0
+        for _ in range(self._maze.getDimentions[0]):
+            x = 1
+            y += 1
+            if y <= self._maze.getDimentions[0]:
+                for _ in range(self._maze.getDimentions[1]):
+                    if self._mazeMap[x, y]["Type"] == 0 and self.findHunt(x, y) != "Dead End":
+                        self._stack.append((x, y))
+                        self._mazeMap[x, y]["Type"] = 1
+                        delWall = self.findHunt(x,y)
+                        if delWall == "S":
+                            self.delSouth(x,y)
+                        elif delWall == "W":
+                            self.delWest(x,y)
+                        elif delWall == "E":
+                            self.delEast(x,y)
+                        elif delWall == "N":
+                            self.delNorth(x,y)
+                        #print(f"X:{x+1} Y:{self._lastSolvedLine}")
+                        self.algorithm(x, y)
+                    x+=1
+            else:
+                print("ERROR THING")
 
 
     def algorithm(self, x, y):
+        #print(self._stack)
+        #print(self._lastSolvedLine)
         self._stack.append(self.findNextMove(x,y))
-        if self._stack[-1] == self._maze.getEndPos:
+        if self._lastSolvedLine >= self._maze.getDimentions[0]:
+            self._stack.pop()
+            self.changeCellType(self._maze.getStartPos[0], self._maze.getStartPos[1], 3)
             self.changeCellType(self._maze.getEndPos[0], self._maze.getEndPos[1], 4)
             tempMaze = copy.deepcopy(self._mazeMap)
             self._maze.setTempMaze(tempMaze)
@@ -248,13 +290,12 @@ class HuntAndKill(Generator):
         try:
             self.algorithm(self._stack[-1][1], self._stack[-1][2])       
         except IndexError:
-            pass
-        '''
+            self.changeCellType(self._maze.getStartPos[0], self._maze.getStartPos[1], 3)
             self.changeCellType(self._maze.getEndPos[0], self._maze.getEndPos[1], 4)
             tempMaze = copy.deepcopy(self._mazeMap)
             self._maze.setTempMaze(tempMaze)
             print("Generated Maze")
-        '''
+        
 
 class BFS(Generator):
     def __init__(self):
