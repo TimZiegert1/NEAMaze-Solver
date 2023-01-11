@@ -1,6 +1,7 @@
 import random
 from mazeGen import *
 import sys
+import copy
 
 #sys.setrecursionlimit(100)
 class Generator:
@@ -131,9 +132,9 @@ class RDFS(Generator):
     def __init__(self, mazeGen):
         super().__init__(mazeGen)
         self._stack = []
+        self._stackGen = []
 
     def run(self):
-        #print(self._mazeGen.getEndPos, self._mazeGen.getStartPos)
         self.changeCellType(self._maze.getEndPos[0], self._maze.getEndPos[1], 0)
         self.generate(self._maze.getStartPos[0], self._maze.getStartPos[1])
 
@@ -142,7 +143,6 @@ class RDFS(Generator):
         self._stack.pop()
         try:
             if self.findNextMove(self._stack[-1][1], self._stack[-1][2]) == "Dead End":
-                #print(self._stack)
                 self.deadEnd()
         except:
             pass
@@ -151,6 +151,8 @@ class RDFS(Generator):
     def generate(self, x, y):
         #self._stack.append(self.getStartPos)
         self._stack.append(self.findNextMove(x,y))
+        if self._stack[-1] != "Dead End":
+            self._stackGen.append(self._stack[-1][1:])
         if self._stack[-1][0] == "S":
             self.delSouth(self._stack[-1][1],self._stack[-1][2])
         elif self._stack[-1][0] == "W":
@@ -170,9 +172,89 @@ class RDFS(Generator):
             self.generate(self._stack[-1][1], self._stack[-1][2])       
         except IndexError:
             self.changeCellType(self._maze.getEndPos[0], self._maze.getEndPos[1], 4)
-            tempMaze = self._mazeMap.copy()
+            tempMaze = copy.deepcopy(self._mazeMap)
             self._maze.setTempMaze(tempMaze)
             print("Generated Maze")
+
+    @property
+    def getGen(self):
+        print(self._stackGen)
+        return self._stackGen
+
+class HuntAndKill(Generator):
+    def __init__(self, mazeGen):
+        super().__init__(mazeGen)
+        self._stack = []
+        self._lastSolvedLine = 1
+
+    def run(self):
+        self.changeCellType(self._maze.getEndPos[0], self._maze.getEndPos[1], 0)
+        self.algorithm(self._maze.getStartPos[0], self._maze.getStartPos[1])
+
+    def findHunt(self, x, y):
+        neighCells = []
+        try:
+            if self._mazeMap[x,y+1]["Type"] == 1: neighCells.append((x,y+1))
+        except KeyError: pass
+            #This means that the cell is on the edge of the maze or has been visited
+        try:
+            if self._mazeMap[x-1,y]["Type"] == 1: neighCells.append((x-1,y))
+        except KeyError:pass 
+        try:
+            if self._mazeMap[x,y-1]["Type"] == 1: neighCells.append((x,y-1))
+        except KeyError:pass
+        try:
+            if self._mazeMap[x+1,y]["Type"] == 1: neighCells.append((x+1,y))
+        except KeyError:pass
+        if len(neighCells) == 0: return "Dead End"
+        return random.choice(neighCells)    
+
+    def deadEnd(self):
+        if self._lastSolvedLine <= self._maze.getDimentions[0]:
+            for x in range(self._maze.getDimentions[1]):
+                if self._mazeMap[x+1, self._lastSolvedLine]["Type"] == 0 and self.findHunt(x, self._lastSolvedLine) != "Dead End":
+                    self.algorithm(x+1, self._lastSolvedLine)
+                elif self._mazeMap[x+1, self._lastSolvedLine]["Type"] == 1 and x+1 == self._maze.getDimentions[1]:
+                    self._lastSolvedLine += 1
+                    self.deadEnd()
+        else:
+            print("ERROR THING")
+
+
+    def algorithm(self, x, y):
+        self._stack.append(self.findNextMove(x,y))
+        if self._stack[-1] == self._maze.getEndPos:
+            self.changeCellType(self._maze.getEndPos[0], self._maze.getEndPos[1], 4)
+            tempMaze = copy.deepcopy(self._mazeMap)
+            self._maze.setTempMaze(tempMaze)
+            print("Generated Maze")
+            return
+        if self._stack[-1][0] == "S":
+            self.delSouth(self._stack[-1][1],self._stack[-1][2])
+        elif self._stack[-1][0] == "W":
+            self.delWest(self._stack[-1][1],self._stack[-1][2])
+        elif self._stack[-1][0] == "E":
+            self.delEast(self._stack[-1][1],self._stack[-1][2])
+        elif self._stack[-1][0] == "N":
+            self.delNorth(self._stack[-1][1],self._stack[-1][2])
+        elif self._stack[-1] == "Dead End":
+            self._stack.pop()
+            self.deadEnd() 
+        try:
+            self.changeCellType(self._stack[-1][1],self._stack[-1][2],1)
+        except:
+            #print("Dont hit run twice")
+            pass
+        try:
+            self.algorithm(self._stack[-1][1], self._stack[-1][2])       
+        except IndexError:
+            pass
+        '''
+            self.changeCellType(self._maze.getEndPos[0], self._maze.getEndPos[1], 4)
+            tempMaze = copy.deepcopy(self._mazeMap)
+            self._maze.setTempMaze(tempMaze)
+            print("Generated Maze")
+        '''
 
 class BFS(Generator):
     def __init__(self):
@@ -190,13 +272,3 @@ class BFS(Generator):
     def getStack(self):
         return self._stack
 
-class HuntAndKill(Generator):
-    def __init__(self):
-        super().__init__()
-        self._lastSolvedLine = 0
-
-    def algorithm():
-        ...
-
-    def SearchBlankCell():
-        ...

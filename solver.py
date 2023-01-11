@@ -1,4 +1,5 @@
 from generator import *
+from Ui import *
 import random
 from queue import PriorityQueue
 class Solver:
@@ -52,14 +53,13 @@ class Solver:
         nextMove.append(random.choice(self.checkNeighCells(x, y)))
         return (nextMove[0][0], nextMove[0][1])
 
-    def runRDFS(self):
-        DFS().run()
-
 class DFS(Solver):
     def __init__(self, mazeGen):
         super().__init__(mazeGen)
         self._stackSearched = []
         self._stack = []
+        self._tempStack = []
+        self._tempStackSearched = []
     
     def run(self):
         self.solve(self._startPos[0], self._startPos[1])
@@ -73,8 +73,11 @@ class DFS(Solver):
         if self.checkIsEnd(x, y) == "End":
             print("Solved")
             self.setSolution()
+            self._tempStackSearched = self._stackSearched.copy()
+            self._stackSearched = []
+            self._tempStack = self._stack.copy()
             self._stack = []
-            return "Solved"
+            return self._stackSearched, self._tempStack
         self._stack.append(self.findNextMove(x, y))
         if self._stack[-1] != "DeadEnd":
             self._stackSearched.append(self._stack[-1])
@@ -85,9 +88,11 @@ class DFS(Solver):
             pass
         try:
             self._mazeMap[self._stack[-1][0], self._stack[-1][1]]["Type"] = 2
+            #self._gui.drawMaze(self._mazeMap)
         except:
             print("Dont hit solve twice")
         try:
+            #time.sleep(0.5)
             self.solve(self._stack[-1][0], self._stack[-1][1])
         except IndexError:
             pass
@@ -102,6 +107,13 @@ class DFS(Solver):
         self._mazeMap[self._startPos[0], self._startPos[1]]["Type"] = 3
         self._mazeMap[self._endPos[0], self._endPos[1]]["Type"] = 4
 
+    @property
+    def getSolution(self):
+        return self._tempStack
+
+    @property
+    def getSearch(self):
+        return self._tempStackSearched
 
 class AStar(Solver):
     def __init__(self, mazeGen: MazeGen):
@@ -155,6 +167,10 @@ class AStar(Solver):
         self._mazeMap[self._startPos[0], self._startPos[1]]["Type"] = 3
         self._mazeMap[self._endPos[0], self._endPos[1]]["Type"] = 4
 
+    @property
+    def getSolution(self):
+        return self._searchPath, self._solvePath
+
 
 class BFS(Solver):
     def __init__(self, mazeGen:MazeGen):
@@ -169,17 +185,20 @@ class BFS(Solver):
         self.solve()
 
     def solve(self):
-        currCell = self._front.pop(0)
-        if self.checkIsEnd(currCell[0], currCell[1]) == "End":
-            self._searched[self._end] = currCell
-            print("Solved")
-            self.setSolution()
-            return "Solved"
-        for childCell in self.checkNeighCells(currCell[0], currCell[1]):
-            self._mazeMap[childCell[0], childCell[1]]["Type"] = 5
-            self._front.append(childCell)
-            self._searched[childCell] = currCell
-        self.solve()
+        try:
+            currCell = self._front.pop(0)
+            if self.checkIsEnd(currCell[0], currCell[1]) == "End":
+                self._searched[self._end] = currCell
+                print("Solved")
+                self.setSolution()
+                return "Solved"
+            for childCell in self.checkNeighCells(currCell[0], currCell[1]):
+                self._mazeMap[childCell[0], childCell[1]]["Type"] = 5
+                self._front.append(childCell)
+                self._searched[childCell] = currCell
+            self.solve()
+        except:
+            pass
 
 
     def setSolution(self):
@@ -194,20 +213,70 @@ class BFS(Solver):
         self._mazeMap[self._startPos[0], self._startPos[1]]["Type"] = 3
         self._mazeMap[self._endPos[0], self._endPos[1]]["Type"] = 4
 
+    @property
+    def getSolution(self):
+        return self._searched, self._solvePath
+
+class Dijkstra(Solver):
+    def __init__(self, mazeGen:MazeGen) -> None:
+        super().__init__(mazeGen)
+
+    def run():
+        ...
+
 class RHW(Solver):
-    def __init__(self):
-        super().__init__()
+    def __init__(self, mazeGen:MazeGen):
+        super().__init__(mazeGen)
+        self._direction = {"up": "N", "left": "W", "down": "S", "right": "E"}
         self._stack = []
 
     def run(self):
-        self.solve()
+        self.solve(self._startPos[0], self._startPos[1])
+
+    def rotateCW(self):
+        values = list(self._direction.values())
+        self._direction = dict(zip(self._direction.keys(), [values[-1]]+values[:-1]))
+
+    def rotateCCW(self):
+        values = list(self._direction.values())
+        self._direction = dict(zip(self._direction.keys(), values[1:]+[values[0]]))
+
+    def moveForward(self, x:int, y:int):
+        if self._direction["up"] == "N":
+            return (x, y+1)
+        elif self._direction["up"] == "E":
+            return (x+1, y)
+        elif self._direction["up"] == "S":
+            return (x, y-1)
+        elif self._direction["up"] == "W":
+            return (x-1, y)
 
     def deadEnd(self):
         self._stack.pop()
-        if self.findNextMove(self._stack[-1][0], self._stack[-1][1]) == "DeadEnd":
-            self.deadEnd()
+        self.solve(self._stack[-1][0], self._stack[-1][1])
     
-    def solve(self, mazeMap, x:int, y:int):
-        #Follows the right hand side of the wall
-        ...
+    def solve(self,x:int, y:int):
+        self._stack.append((x, y))
+        print(self._stack)
+        if self.checkIsEnd(x, y) == "End":
+            print("Solved")
+            self.setSolution()
+            return "Solved"
+        if self._mazeMap[x, y]["E"] == 1:
+            if self._mazeMap[x, y]["N"] == 1:
+                self.rotateCW()
+            else:
+                self.solve(self.moveForward(x, y)[0], self.moveForward(x, y)[1])
+        else:
+            self.rotateCCW()
+            self.solve(self.moveForward(x, y)[0], self.moveForward(x, y)[1])
+
+
+    def setSolution(self):
+        for cell in self._stack:
+            self._mazeMap[cell[0], cell[1]]["Type"] = 5
+        self._mazeMap[self._startPos[0], self._startPos[1]]["Type"] = 3
+        self._mazeMap[self._endPos[0], self._endPos[1]]["Type"] = 4
+
+
 
