@@ -38,8 +38,6 @@ class GUI(Ui):
         pygame.init()
         self._font = pygame.font.Font(None, 50)
         self._main = tk.Tk()
-        self._settings = tk.Tk()
-        self._settings.withdraw()
         self._mazeScreen = pygame.display.set_mode((1375,850), flags=pygame.HIDDEN) #15 rows and 15 col is perfect fit!
 
     def run(self):
@@ -56,6 +54,7 @@ class GUI(Ui):
         self._main.mainloop()
 
     def settingsPanel(self):
+        self._settings = tk.Tk()
         self._settings.deiconify()
         self._settings.title("Settings")
         widthLabel = tk.Label(self._settings, text="Width")
@@ -98,7 +97,8 @@ class GUI(Ui):
         #self._mazeGen.genMaze()
         print(self._mazeGen.getMazeMap)
         self.drawMaze(self._mazeGen.getMazeMap)
-        self._settings.withdraw()
+        self._settings.destroy()
+        #self._settings.withdraw()
         self.mazePanel()
 
     def helpButton(self):
