@@ -155,8 +155,7 @@ class RDFS(Generator):
     def generate(self, x, y):
         #self._stack.append(self.getStartPos)
         self._stack.append(self.findNextMove(x,y))
-        if self._stack[-1] != "Dead End":
-            self._stackGen.append(self._stack[-1][1:])
+        self._stackGen.append(self.findNextMove(x,y))
         if self._stack[-1][0] == "S":
             self.delSouth(self._stack[-1][1],self._stack[-1][2])
         elif self._stack[-1][0] == "W":
@@ -182,7 +181,6 @@ class RDFS(Generator):
 
     @property
     def getGen(self):
-        print(self._stackGen)
         return self._stackGen
 
 #NOT 100% WORKING CHECK ON IT
@@ -230,7 +228,7 @@ class HuntAndKill(Generator):
     def checkLineSolved(self):
         count = 0
         for x in range(self._maze.getWidth):
-            if self._mazeMap[x+1, self._lastSolvedLine]["Type"] == 1: 
+            if self.findHunt(x+1, self._lastSolvedLine) == "Dead End":
                 count += 1
             if count == self._maze.getWidth:
                 self._lastSolvedLine += 1

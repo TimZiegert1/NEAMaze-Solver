@@ -60,7 +60,7 @@ class DFS(Solver):
         self._stack = []
         self._tempStack = []
         self._tempStackSearched = []
-    
+
     def run(self):
         self.solve(self._startPos[0], self._startPos[1])
 
@@ -224,18 +224,24 @@ class Dijkstra(Solver):
         self._searched = {}
         self._revPath = {}
         self._solvedPath = {}
+        self._solved = False
 
     def run(self):
+        self._mazeMap[self._endPos[0], self._endPos[1]]["Type"] = 4
         self.solve()
 
-    #There is no end move in the dictionary it needs to be added manually
+    #The end cell is not being added to the searched list
+    #It sometimes solves it but prints out the wrong path
+    #The search might be a little off
     def solve(self):
-        if len(self._unVisited) > 0:
+        if self._solved == False:
             currCell = min(self._unVisited, key=self._unVisited.get)
             self._searched[currCell] = self._unVisited[currCell]
-            if currCell == (self._endPos[0], self._endPos[1]):
-                print("Solved")
-                self.setSolution()
+            #if currCell == (self._endPos[0], self._endPos[1]):
+            #if self.checkIsEnd(currCell[0], currCell[1]) == "End":
+                #print(self._revPath)
+                #print("Solved")
+                #self.setSolution()
             for childCell in self.checkNeighCells(currCell[0], currCell[1]):
                 if childCell in self._searched:
                     continue
@@ -243,16 +249,22 @@ class Dijkstra(Solver):
                 if tempDist < self._unVisited[childCell]:
                     self._unVisited[childCell] = tempDist
                     self._revPath[childCell] = currCell
+                    if self.checkIsEnd(childCell[0], childCell[1]) == "End" and self._solved == False:
+                        self._solved = True
+                        print(childCell)
+                        self._revPath[tuple(self._endPos)] = childCell
+                        print("Solved")
+                        print(self._revPath)
+                        self.setSolution()
+            #if currCell == (self._endPos[0], self._endPos[1]):
             self._unVisited.pop(currCell)
             self.solve()
 
 
     def setSolution(self):
-        cell = tuple(self._revPath.keys())[-1]
-        print(self._revPath)
+        cell = tuple(self._maze.getEndPos)
         #currently getting stuck
         while cell != tuple(self._maze.getStartPos):
-            print(cell)
             self._solvedPath[self._revPath[cell]] = cell
             cell = self._revPath[cell]
         for cell in self._revPath:
@@ -261,6 +273,7 @@ class Dijkstra(Solver):
             self._mazeMap[cell[0], cell[1]]["Type"] = 2
         self._mazeMap[self._startPos[0], self._startPos[1]]["Type"] = 3
         self._mazeMap[self._endPos[0], self._endPos[1]]["Type"] = 4
+        
 
     @property
     def getSolution(self):

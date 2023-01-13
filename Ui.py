@@ -22,6 +22,8 @@ class Ui:
         self._green = (0, 255, 0)
         self._red = ( 255, 0, 0)
         self._blue = (0,0,255)
+        self._searchTime = 0.15
+        self._solveTime = 0.05
         self._isGeneration = True
 
 class Terminal(Ui):
@@ -64,19 +66,34 @@ class GUI(Ui):
         #self._hSlider.set(self._height)
         wBox = tk.Entry(self._settings, width=5)
         hBox = tk.Entry(self._settings, width=5)
+        speedSearch = tk.Label(self._settings, text="Speed of Search")
+        speedSolve = tk.Label(self._settings, text="Speed of Solve")
+        speedSliderSearch = tk.Scale(self._settings, from_=0.0, to=1.0, resolution=0.01 ,orient=tk.HORIZONTAL)
+        speedSliderSolve = tk.Scale(self._settings, from_=0.0, to=1.0, resolution=0.01 ,orient=tk.HORIZONTAL)
+        speedSliderSearch.set(self._searchTime)
+        speedSliderSolve.set(self._solveTime)
         widthLabel.grid(row=0, column=0)
         heightLabel.grid(row=1, column=0)
+        speedSearch.grid(row=2, column=0)
+        speedSolve.grid(row=3, column=0)
         #self._wSlider.grid(row=0, column=1)
         #self._hSlider.grid(row=1, column=1)
         wBox.grid(row=0, column=1)
         hBox.grid(row=1, column=1)
-        applyButton = tk.Button(self._settings, text="Apply", command=lambda: [self.applyButton(hBox, wBox)])
-        applyButton.grid(row=2, column=0)
+        speedSliderSearch.grid(row=2, column=1)
+        speedSliderSolve.grid(row=3, column=1)
+        applyButton = tk.Button(self._settings, text="Apply", command=lambda: [self.applyButton(hBox, wBox, speedSliderSearch, speedSliderSolve)])
+        applyButton.grid(row=4, column=0)
         self._settings.mainloop()
 
-    def applyButton(self, hBox, wBox):
-        self._width = int(wBox.get())
-        self._height = int(hBox.get())
+    def applyButton(self, hBox, wBox, speedSliderSearch, speedSliderSolve):
+        if hBox.get() == "" or wBox.get() == "" or hBox.get().isdigit() == False or wBox.get().isdigit() == False:
+            pass
+        else:
+            self._width = int(wBox.get())
+            self._height = int(hBox.get())
+        self._searchTime = speedSliderSearch.get()
+        self._solveTime = speedSliderSolve.get()
         self._mazeGen = MazeGen(self._height, self._width)
         #self._mazeGen.genMaze()
         print(self._mazeGen.getMazeMap)
@@ -122,8 +139,11 @@ class GUI(Ui):
                         self._RDFS = RDFS(self._mazeGen)
                         #print(self._RDFS.getGen)
                         self._RDFS.run()
+                        genStack = self._RDFS.getGen
+                        #genStack = [("N",14,14)]
+                        print(genStack)
                         self.drawMaze(self._mazeGen.getMazeMap)
-                        #self.drawMazeTest(self.getMazeMap)
+                        #self.drawMazeGen(genStack)
                 #HuntAndKill gen button
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     mouse = pygame.mouse.get_pos()
@@ -143,7 +163,7 @@ class GUI(Ui):
                         rdfsSearch = self._DFS.getSearch
                         rdfsSolve = self._DFS.getSolution
                         rdfsSolve.reverse()
-                        self.drawMazeSolve(self._mazeGen.getMazeMap, rdfsSearch, rdfsSolve)
+                        self.drawMazeSolve(self._mazeGen.getMazeMap, rdfsSearch, rdfsSolve, self._searchTime, self._solveTime)
                 #Solve AStar Button
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     mouse = pygame.mouse.get_pos()
@@ -154,7 +174,7 @@ class GUI(Ui):
                         AStarSearch = self._AStar.getSolution[0]
                         AStarSolve = self._AStar.getSolution[1]
                         #self.drawMaze(self._mazeGen.getMazeMap)
-                        self.drawMazeSolve(self._mazeGen.getMazeMap, AStarSearch, AStarSolve)
+                        self.drawMazeSolve(self._mazeGen.getMazeMap, AStarSearch, AStarSolve, self._searchTime, self._solveTime)
                 #Solve BFS Button
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     mouse = pygame.mouse.get_pos()
@@ -165,7 +185,7 @@ class GUI(Ui):
                         BFSSearch = self._BFS.getSolution[0]
                         BFSSolve = self._BFS.getSolution[1]
                         #self.drawMaze(self._mazeGen.getMazeMap)
-                        self.drawMazeSolve(self._mazeGen.getMazeMap, BFSSearch, BFSSolve)
+                        self.drawMazeSolve(self._mazeGen.getMazeMap, BFSSearch, BFSSolve, self._searchTime, self._solveTime)
                 #Solve RHW Button
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     mouse = pygame.mouse.get_pos()
@@ -186,7 +206,7 @@ class GUI(Ui):
                         print(DijkstraSearch)
                         print(DijkstraSolve)
                         #self.drawMaze(self._mazeGen.getMazeMap)
-                        self.drawMazeSolve(self._mazeGen.getMazeMap, DijkstraSearch, DijkstraSolve)
+                        self.drawMazeSolve(self._mazeGen.getMazeMap, DijkstraSearch, DijkstraSolve, self._searchTime, self._solveTime)
                 #Generate new maze button
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     mouse = pygame.mouse.get_pos()
@@ -249,14 +269,32 @@ class GUI(Ui):
                         pygame.draw.rect(self._mazeScreen, self._white, (((x*50)+(x-1)*5)+65,(y*55)+10,5,50))
                     if mazeMap[x+1,y+1]["W"] == 0:
                         pygame.draw.rect(self._mazeScreen, self._white, (((x*50)+(x-1)*5)+10,(y*55)+10,5,50)) 
-                #pygame.display.update()
+                    #pygame.display.update()
                 x += 1
         pygame.display.update() #USE THIS IF YOU WANT IT TO BE INSTANT
 
-    def drawMazeGen(self, mazeMap, path):
-        ...
+    def drawMazeGen(self, path):
+        for cell in path:
+            if cell[0] == "S":
+                pygame.draw.rect(self._mazeScreen, self._white, ((cell[1]*55)-45,((cell[2]*50)+(cell[2]-1)*5)+10,50,5))
+                time.sleep(0.05)
+                pygame.display.update()
+            elif cell[0] == "W":
+                pygame.draw.rect(self._mazeScreen, self._white, (((cell[1]*50)+(cell[1]-1)*5)-45,(cell[2]*55)-45,5,50)) 
+                time.sleep(0.05)
+                pygame.display.update()
+            elif cell[0] == "E":
+                pygame.draw.rect(self._mazeScreen, self._white, (((cell[1]*50)+(cell[1]-1)*5)+10,(cell[2]*55)-45,5,50))
+                time.sleep(0.05)
+                pygame.display.update()
+            elif cell[0] == "N":
+                pygame.draw.rect(self._mazeScreen, self._white, ((cell[1]*55)-45,((cell[2]*50)+(cell[2]-1)*5)-45,50,5))
+                time.sleep(0.05)
+                pygame.display.update()
+            elif cell == "Dead End":
+                pass
 
-    def drawMazeSolve(self, mazeMap, searchPath, solvePath, searchTime = 0.1, solveTime = 0.05):
+    def drawMazeSolve(self, mazeMap, searchPath, solvePath, searchTime = 0.15, solveTime = 0.05):
         count = 0
         for cell in searchPath:
             if count != 0:
@@ -280,13 +318,14 @@ class GUI(Ui):
     #Paste rescale code here to test
 
     def getRescaleValue(self, width, height):
-        rescaleValue = 800
-        rescaleHeight = 800/height
-        rescaleWidth = 800/width
+        rescaleValue = 900
+        rescaleHeight = rescaleValue/height
+        rescaleWidth = rescaleValue/width
         x = (5*rescaleHeight)/6
         y = (5*rescaleWidth)/6
         xWalls = x/10
         yWalls = y/10
+        return x, y, xWalls, yWalls
 
 
     def drawButtons(self):
