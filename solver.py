@@ -81,16 +81,13 @@ class DFS(Solver):
         self._stack.append(self.findNextMove(x, y))
         if self._stack[-1] != "DeadEnd":
             self._stackSearched.append(self._stack[-1])
+        if self._stack[-1] == "DeadEnd":
+            self.deadEnd()
         try:
-            if self._stack[-1] == "DeadEnd":
-                self.deadEnd()
-        except:
-            pass
-        try:
+            #print(self._stack)
             self._mazeMap[self._stack[-1][0], self._stack[-1][1]]["Type"] = 2
-            #self._gui.drawMaze(self._mazeMap)
         except:
-            #THIS CAN CAUSE ERROR
+            #this error occurs when the stack is empty, only happens on the second solve in huntandkill
             print("Dont hit solve twice")
         try:
             #time.sleep(0.5)
@@ -143,6 +140,7 @@ class AStar(Solver):
         currCell=self._pQueue.get()[2]
         if self.checkIsEnd(currCell[0], currCell[1]) == "End":
             self._searchPath[self._end] = currCell
+            print(self._searchPath)
             print("Solved")
             self.setSolution()
             return "Solved"
@@ -221,9 +219,52 @@ class BFS(Solver):
 class Dijkstra(Solver):
     def __init__(self, mazeGen:MazeGen) -> None:
         super().__init__(mazeGen)
+        self._unVisited = {cell: float("inf") for cell in self._mazeMap}
+        self._unVisited[self._maze.getStartPos[0], self._maze.getStartPos[1]] = 0
+        self._searched = {}
+        self._revPath = {}
+        self._solvedPath = {}
 
-    def run():
-        ...
+    def run(self):
+        self.solve()
+
+    #There is no end move in the dictionary it needs to be added manually
+    def solve(self):
+        if len(self._unVisited) > 0:
+            currCell = min(self._unVisited, key=self._unVisited.get)
+            self._searched[currCell] = self._unVisited[currCell]
+            if currCell == (self._endPos[0], self._endPos[1]):
+                print("Solved")
+                self.setSolution()
+            for childCell in self.checkNeighCells(currCell[0], currCell[1]):
+                if childCell in self._searched:
+                    continue
+                tempDist = self._unVisited[currCell] + 1
+                if tempDist < self._unVisited[childCell]:
+                    self._unVisited[childCell] = tempDist
+                    self._revPath[childCell] = currCell
+            self._unVisited.pop(currCell)
+            self.solve()
+
+
+    def setSolution(self):
+        cell = tuple(self._revPath.keys())[-1]
+        print(self._revPath)
+        #currently getting stuck
+        while cell != tuple(self._maze.getStartPos):
+            print(cell)
+            self._solvedPath[self._revPath[cell]] = cell
+            cell = self._revPath[cell]
+        for cell in self._revPath:
+            self._mazeMap[cell[0], cell[1]]["Type"] = 5
+        for cell in self._solvedPath:
+            self._mazeMap[cell[0], cell[1]]["Type"] = 2
+        self._mazeMap[self._startPos[0], self._startPos[1]]["Type"] = 3
+        self._mazeMap[self._endPos[0], self._endPos[1]]["Type"] = 4
+
+    @property
+    def getSolution(self):
+        return self._revPath, self._solvedPath
 
 class RHW(Solver):
     def __init__(self, mazeGen:MazeGen):

@@ -8,7 +8,6 @@ class MazeGen():
         self.mazeMap = self.mazeMapReturn[0]
         self.grid = self.mazeMapReturn[1]
         #self.tempMaze = {}
-        self._dimentions = [self._height, self._width]
         self.__pickEdge = self.pickEdge()
         self.startPos = self.__pickEdge[0]
         self.endPos = self.__pickEdge[1]
@@ -117,6 +116,16 @@ class MazeGen():
     def getEndPos(self) -> list:
         return self.endPos
 
+    def setWidth(self, newWidth:int) -> int:
+        self._width = newWidth
+
     @property
-    def getDimentions(self) -> list:
-        return self._dimentions
+    def getWidth(self) -> int:
+        return self._width
+    
+    def setHeight(self, newHeight:int) -> int:
+        self._height = newHeight
+
+    @property
+    def getHeight(self) -> int:
+        return self._height

@@ -7,8 +7,8 @@ import copy
 import time
 class Ui:
     def __init__(self):
-        self._height = 15
-        self._width = 15
+        self._height = 5
+        self._width = 5
         self._mazeGen = MazeGen(self._height, self._width)
         #self._gen = Generator(self._mazeGen.getMazeMap, self._mazeGen.getStartPos, self._mazeGen.getEndPos, self._mazeGen)
         #self._RDFS = RDFS(self._mazeGen)
@@ -23,19 +23,6 @@ class Ui:
         self._red = ( 255, 0, 0)
         self._blue = (0,0,255)
         self._isGeneration = True
-
-    def changeWidth(self, newWidth):
-        self._width = newWidth
-    
-    def getWidth(self):
-        return self._height
-
-    def changeHeight(self, newHeight):
-        self._height = newHeight
-
-    def getHeight(self):
-        return self._height
-
 
 class Terminal(Ui):
     def __init__(self):
@@ -71,13 +58,31 @@ class GUI(Ui):
         self._settings.title("Settings")
         widthLabel = tk.Label(self._settings, text="Width")
         heightLabel = tk.Label(self._settings, text="Height")
-        widthEntry = tk.Entry(self._settings)
-        heightEntry = tk.Entry(self._settings)
+        #self._wSlider = tk.Scale(self._settings, from_=4, to=200, orient=tk.HORIZONTAL, command=self.slide())#, command=self.changeWidth)
+        #self._hSlider = tk.Scale(self._settings, from_=4, to=200, orient=tk.HORIZONTAL)#, command=self.changeHeight)
+        #self._wSlider.set(self._width)
+        #self._hSlider.set(self._height)
+        wBox = tk.Entry(self._settings, width=5)
+        hBox = tk.Entry(self._settings, width=5)
         widthLabel.grid(row=0, column=0)
         heightLabel.grid(row=1, column=0)
-        widthEntry.grid(row=0, column=1)
-        heightEntry.grid(row=1, column=1)
+        #self._wSlider.grid(row=0, column=1)
+        #self._hSlider.grid(row=1, column=1)
+        wBox.grid(row=0, column=1)
+        hBox.grid(row=1, column=1)
+        applyButton = tk.Button(self._settings, text="Apply", command=lambda: [self.applyButton(hBox, wBox)])
+        applyButton.grid(row=2, column=0)
         self._settings.mainloop()
+
+    def applyButton(self, hBox, wBox):
+        self._width = int(wBox.get())
+        self._height = int(hBox.get())
+        self._mazeGen = MazeGen(self._height, self._width)
+        #self._mazeGen.genMaze()
+        print(self._mazeGen.getMazeMap)
+        self.drawMaze(self._mazeGen.getMazeMap)
+        self._settings.withdraw()
+        self.mazePanel()
 
     def helpButton(self):
         ...
@@ -169,6 +174,19 @@ class GUI(Ui):
                         self._RHW = RHW(self._mazeGen)
                         self._RHW.run()
                         self.drawMaze(self._mazeGen.getMazeMap)
+                #Dijkstra Button
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    mouse = pygame.mouse.get_pos()  
+                    if mouse[0] > 980 and mouse[1] > 220 and mouse[1] < 270 and mouse[0] < 1080:
+                        self._isGeneration = False
+                        self._Dijkstra = Dijkstra(self._mazeGen)
+                        self._Dijkstra.run()
+                        DijkstraSearch = self._Dijkstra.getSolution[0]
+                        DijkstraSolve = self._Dijkstra.getSolution[1]
+                        print(DijkstraSearch)
+                        print(DijkstraSolve)
+                        #self.drawMaze(self._mazeGen.getMazeMap)
+                        self.drawMazeSolve(self._mazeGen.getMazeMap, DijkstraSearch, DijkstraSolve)
                 #Generate new maze button
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     mouse = pygame.mouse.get_pos()
@@ -281,6 +299,7 @@ class GUI(Ui):
         self.solveAStarButton(self._mazeScreen, self._black ,(980, 470,100, 50), "A*")
         self.solveBFSButton(self._mazeScreen, self._black ,(980, 420,100, 50), "BFS")
         self.solveRHWButton(self._mazeScreen, self._black ,(980, 370,100, 50), "RHW")
+        self.solveDijkstraButton(self._mazeScreen, self._black ,(980, 220,100, 50), "Dijkstra")
         self.clearSolveButton(self._mazeScreen, self._black ,(980, 320,100, 50), "Clear Solve")
     
     def quitButton(self, screen, colour, pos, text:str):
@@ -314,6 +333,11 @@ class GUI(Ui):
         screen.blit(solveText, solveText.get_rect(center=solveButton.center))
 
     def solveRHWButton(self, screen, colour, pos, text:str):
+        solveButton = pygame.draw.rect(screen, colour, pos)
+        solveText = self._font.render(text, True, (255,0,0))
+        screen.blit(solveText, solveText.get_rect(center=solveButton.center))
+
+    def solveDijkstraButton(self, screen, colour, pos, text:str):
         solveButton = pygame.draw.rect(screen, colour, pos)
         solveText = self._font.render(text, True, (255,0,0))
         screen.blit(solveText, solveText.get_rect(center=solveButton.center))

@@ -28,39 +28,43 @@ class Generator:
         Checks for a wall on the coords inputed and with change that wall type into a 0 denoting that the wall is removed
         '''
         self._mazeMap[x,y]["N"] = 0
+        #if y-1 > 0:
         try:
             if self._mazeMap[x,y-1]["S"] > 0:
                 self._mazeMap[x,y-1]["S"] = 0
-        except:
+        except KeyError:
+        #elif y-1 ==0:
             #This mean a Outside wall has been hit
-            self.outsideWall(x, y)
             pass
     
     def delEast(self,x:int,y:int):
         self._mazeMap[x,y]["E"] = 0
         try:
+        #if x+1 < self._maze.getDimentions[0]:
             if self._mazeMap[x+1,y]["W"] > 0:
                 self._mazeMap[x+1,y]["W"] = 0   
-        except:
-            self.outsideWall(x, y)
+        except KeyError:
+        #elif x+1 == self._maze.getDimentions[0]:
             pass
 
     def delSouth(self,x:int,y:int):
         self._mazeMap[x,y]["S"] = 0
         try:
+        #if y+1 < self._maze.getDimentions[1]:
             if self._mazeMap[x,y+1]["N"] > 0:
                 self._mazeMap[x,y+1]["N"] = 0
-        except:
-            self.outsideWall(x, y)
+        except KeyError:
+        #elif y+1 == self._maze.getDimentions[1]:
             pass
 
     def delWest(self,x:int,y:int):
         self._mazeMap[x,y]["W"] = 0
         try:
+        #if x-1 > 0:
             if self._mazeMap[x-1,y]["E"] > 0:
                 self._mazeMap[x-1,y]["E"] = 0
-        except:
-            self.outsideWall(x, y)
+        except KeyError:
+        #elif x-1 == 0:
             pass
 
     def changeCellType(self, x:int, y:int, newCellType:int):
@@ -81,19 +85,19 @@ class Generator:
         This will check the neighbouring cells of the current cell and return a list of the cells that are not visited
         '''
         neighCells = []
-        try:
+        if y+1 > self._maze.getHeight: pass
+        else:
             if self._mazeMap[x,y+1]["Type"] == type: neighCells.append((x,y+1))
-        except KeyError: pass
             #This means that the cell is on the edge of the maze or has been visited
-        try:
+        if x-1 <= 0: pass
+        else:
             if self._mazeMap[x-1,y]["Type"] == type: neighCells.append((x-1,y))
-        except KeyError:pass 
-        try:
+        if y-1 <= 0: pass
+        else:
             if self._mazeMap[x,y-1]["Type"] == type: neighCells.append((x,y-1))
-        except KeyError:pass
-        try:
+        if x+1 > self._maze.getWidth: pass
+        else:
             if self._mazeMap[x+1,y]["Type"] == type: neighCells.append((x+1,y))
-        except KeyError:pass
         return neighCells
         
     def findNextMove(self, x:int, y:int):
@@ -195,7 +199,6 @@ class HuntAndKill(Generator):
 
     def findHunt(self, x, y):
         neighCells = []
-        delNum = -1
         try:
             if self._mazeMap[x,y+1]["Type"] == 1: 
                 #self.delSouth(x,y)
@@ -226,20 +229,20 @@ class HuntAndKill(Generator):
 
     def checkLineSolved(self):
         count = 0
-        for x in range(self._maze.getDimentions[1]):
+        for x in range(self._maze.getWidth):
             if self._mazeMap[x+1, self._lastSolvedLine]["Type"] == 1: 
                 count += 1
-            if count == self._maze.getDimentions[1]:
+            if count == self._maze.getWidth:
                 self._lastSolvedLine += 1
 
     def deadEnd(self):
         self.checkLineSolved()
-        y = 0
-        for _ in range(self._maze.getDimentions[0]):
+        y = -1+self._lastSolvedLine
+        for _ in range(self._maze.getHeight):
             x = 1
             y += 1
-            if y <= self._maze.getDimentions[0]:
-                for _ in range(self._maze.getDimentions[1]):
+            if y <= self._maze.getHeight:
+                for _ in range(self._maze.getWidth):
                     if self._mazeMap[x, y]["Type"] == 0 and self.findHunt(x, y) != "Dead End":
                         self._stack.append((x, y))
                         self._mazeMap[x, y]["Type"] = 1
@@ -256,14 +259,15 @@ class HuntAndKill(Generator):
                         self.algorithm(x, y)
                     x+=1
             else:
-                print("ERROR THING")
+                pass
 
 
     def algorithm(self, x, y):
+        print(f"LAST LINE SOLVED: {self._lastSolvedLine}")
         #print(self._stack)
         #print(self._lastSolvedLine)
         self._stack.append(self.findNextMove(x,y))
-        if self._lastSolvedLine >= self._maze.getDimentions[0]:
+        if self._lastSolvedLine == self._maze.getHeight:
             self._stack.pop()
             self.changeCellType(self._maze.getStartPos[0], self._maze.getStartPos[1], 3)
             self.changeCellType(self._maze.getEndPos[0], self._maze.getEndPos[1], 4)
@@ -288,14 +292,18 @@ class HuntAndKill(Generator):
             #print("Dont hit run twice")
             pass
         try:
-            self.algorithm(self._stack[-1][1], self._stack[-1][2])       
+            print(self._stack[-1][1], self._stack[-1][2])
+            self.algorithm(self._stack[-1][1], self._stack[-1][2]) 
+        except:
+            pass      
+        '''
         except IndexError:
             self.changeCellType(self._maze.getStartPos[0], self._maze.getStartPos[1], 3)
             self.changeCellType(self._maze.getEndPos[0], self._maze.getEndPos[1], 4)
             tempMaze = copy.deepcopy(self._mazeMap)
             self._maze.setTempMaze(tempMaze)
             print("Generated Maze")
-        
+        '''
 
 class BFS(Generator):
     def __init__(self):
