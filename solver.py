@@ -140,7 +140,6 @@ class AStar(Solver):
         currCell=self._pQueue.get()[2]
         if self.checkIsEnd(currCell[0], currCell[1]) == "End":
             self._searchPath[self._end] = currCell
-            print(self._searchPath)
             print("Solved")
             self.setSolution()
             return "Solved"
@@ -234,14 +233,12 @@ class Dijkstra(Solver):
     #It sometimes solves it but prints out the wrong path
     #The search might be a little off
     def solve(self):
-        if self._solved == False:
-            currCell = min(self._unVisited, key=self._unVisited.get)
+        currCell = min(self._unVisited, key=self._unVisited.get)
+        if self.checkIsEnd(currCell[0], currCell[1]) == "End" and self._solved == False:
+            self._revPath[tuple(self._endPos)] = currCell
+            self.setSolution()
+        else:
             self._searched[currCell] = self._unVisited[currCell]
-            #if currCell == (self._endPos[0], self._endPos[1]):
-            #if self.checkIsEnd(currCell[0], currCell[1]) == "End":
-                #print(self._revPath)
-                #print("Solved")
-                #self.setSolution()
             for childCell in self.checkNeighCells(currCell[0], currCell[1]):
                 if childCell in self._searched:
                     continue
@@ -249,17 +246,9 @@ class Dijkstra(Solver):
                 if tempDist < self._unVisited[childCell]:
                     self._unVisited[childCell] = tempDist
                     self._revPath[childCell] = currCell
-                    if self.checkIsEnd(childCell[0], childCell[1]) == "End" and self._solved == False:
-                        self._solved = True
-                        print(childCell)
-                        self._revPath[tuple(self._endPos)] = childCell
-                        print("Solved")
-                        print(self._revPath)
-                        self.setSolution()
             #if currCell == (self._endPos[0], self._endPos[1]):
             self._unVisited.pop(currCell)
             self.solve()
-
 
     def setSolution(self):
         cell = tuple(self._maze.getEndPos)

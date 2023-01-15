@@ -1,7 +1,7 @@
 import random
 
 class MazeGen():
-    def __init__(self, height:int=10, width:int=10):
+    def __init__(self, height:int=15, width:int=15):
         self._height = height
         self._width = width
         self.mazeMapReturn = self.genMaze()  

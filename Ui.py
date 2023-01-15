@@ -7,16 +7,10 @@ import copy
 import time
 class Ui:
     def __init__(self):
-        self._height = 5
-        self._width = 5
+        #self._clock = pygame.time.Clock()
+        self._height = 15
+        self._width = 15
         self._mazeGen = MazeGen(self._height, self._width)
-        #self._gen = Generator(self._mazeGen.getMazeMap, self._mazeGen.getStartPos, self._mazeGen.getEndPos, self._mazeGen)
-        #self._RDFS = RDFS(self._mazeGen)
-        #self._solver = Solver(self._mazeGen.getMazeMap, self._mazeGen.getStartPos, self._mazeGen.getEndPos, self._mazeGen)
-        #self._DFS = DFS(self._mazeGen)
-        #self._height = int(input("Please enter the height of the maze: "))
-        #self._width = int(input("Please enter the width of the maze: "))
-        #self._gen.genMaze(self._height, self._width)
         self._black= (0, 0, 0)
         self._white = (255, 255, 255)
         self._green = (0, 255, 0)
@@ -24,7 +18,8 @@ class Ui:
         self._blue = (0,0,255)
         self._searchTime = 0.15
         self._solveTime = 0.05
-        self._isGeneration = True
+        self._isPaused = False
+        self._isGeneration = False
 
 class Terminal(Ui):
     def __init__(self):
@@ -63,39 +58,53 @@ class GUI(Ui):
         #self._hSlider = tk.Scale(self._settings, from_=4, to=200, orient=tk.HORIZONTAL)#, command=self.changeHeight)
         #self._wSlider.set(self._width)
         #self._hSlider.set(self._height)
-        wBox = tk.Entry(self._settings, width=5)
-        hBox = tk.Entry(self._settings, width=5)
         speedSearch = tk.Label(self._settings, text="Speed of Search")
         speedSolve = tk.Label(self._settings, text="Speed of Solve")
-        speedSliderSearch = tk.Scale(self._settings, from_=0.0, to=1.0, resolution=0.01 ,orient=tk.HORIZONTAL)
-        speedSliderSolve = tk.Scale(self._settings, from_=0.0, to=1.0, resolution=0.01 ,orient=tk.HORIZONTAL)
-        speedSliderSearch.set(self._searchTime)
-        speedSliderSolve.set(self._solveTime)
+        startPos = tk.Label(self._settings, text="Start Position")
+        endPos = tk.Label(self._settings, text="End Position")
         widthLabel.grid(row=0, column=0)
         heightLabel.grid(row=1, column=0)
         speedSearch.grid(row=2, column=0)
         speedSolve.grid(row=3, column=0)
+        startPos.grid(row=4, column=0)
+        endPos.grid(row=5, column=0) 
+        wBox = tk.Entry(self._settings, width=5)
+        hBox = tk.Entry(self._settings, width=5)
+        speedSliderSearch = tk.Scale(self._settings, from_=0.0, to=1.0, resolution=0.01 ,orient=tk.HORIZONTAL)
+        speedSliderSolve = tk.Scale(self._settings, from_=0.0, to=1.0, resolution=0.01 ,orient=tk.HORIZONTAL)
+        speedSliderSearch.set(self._searchTime)
+        speedSliderSolve.set(self._solveTime)
+        startPosbox = tk.Entry(self._settings, width=5)
+        endPosbox = tk.Entry(self._settings, width=5)
         #self._wSlider.grid(row=0, column=1)
         #self._hSlider.grid(row=1, column=1)
         wBox.grid(row=0, column=1)
         hBox.grid(row=1, column=1)
         speedSliderSearch.grid(row=2, column=1)
         speedSliderSolve.grid(row=3, column=1)
-        applyButton = tk.Button(self._settings, text="Apply", command=lambda: [self.applyButton(hBox, wBox, speedSliderSearch, speedSliderSolve)])
-        applyButton.grid(row=4, column=0)
+        startPosbox.grid(row=4, column=1)
+        endPosbox.grid(row=5, column=1)
+        applyButton = tk.Button(self._settings, text="Apply", command=lambda: [self.applyButton(hBox, wBox, speedSliderSearch, speedSliderSolve, startPosbox, endPosbox), self._settings.destroy(), self.mazePanel()])
+        applyButton.grid(row=6, column=0)
         self._settings.mainloop()
 
-    def applyButton(self, hBox, wBox, speedSliderSearch, speedSliderSolve):
-        if hBox.get() == "" or wBox.get() == "" or hBox.get().isdigit() == False or wBox.get().isdigit() == False:
+    def applyButton(self, hBox, wBox, speedSliderSearch, speedSliderSolve, startPosbox, endPosbox):
+        if hBox.get() == "" or wBox.get() == "" or hBox.get().isdigit() == False or wBox.get().isdigit() == False or int(hBox.get()) < 4 or int(wBox.get()) < 4 or int(hBox.get()) > 200 or int(wBox.get()) > 200:
             pass
         else:
             self._width = int(wBox.get())
             self._height = int(hBox.get())
+        if startPosbox.get() == "" or endPosbox.get() == "" or endPosbox.get().isdigit() == False or endPosbox.get().isdigit() == False or int(startPosbox.get()) <= 0 or int(endPosbox.get()) <= 0 or int(startPosbox.get()) > self._mazeGen.getWidth or int(endPosbox.get()) > self._mazeGen.getWidth:
+            pass
+        else:
+            self._mazeGen.getMazeMap[self._mazeGen.getStartPos]["Type"] = 0
+            self._mazeGen.getMazeMap[self._mazeGen.getEndPos]["Type"] = 0
+            self._mazeGen.getMazeMap[int(startPosbox.get())].setStartPos()
+            self._mazeGen.getMazeMap[int(endPosbox.get())].setEndPos()
         self._searchTime = speedSliderSearch.get()
         self._solveTime = speedSliderSolve.get()
         self._mazeGen = MazeGen(self._height, self._width)
         #self._mazeGen.genMaze()
-        print(self._mazeGen.getMazeMap)
         self.drawMaze(self._mazeGen.getMazeMap)
         self._settings.destroy()
         #self._settings.withdraw()
@@ -117,18 +126,18 @@ class GUI(Ui):
                 if event.type == pygame.QUIT:
                     running = False
                     break
+                #Quit button
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    mouse = pygame.mouse.get_pos()
+                    if mouse[0] > 980 and mouse[1] > 670 and mouse[1] < 720 and mouse[0] < 1080:
+                        running = False
+                        break
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     mouse = pygame.mouse.get_pos()
                     if mouse[0] > 1290 and mouse[1] > 10 and mouse[1] < 85 and mouse[0] < 1365:
                         print("settings")
                         #run settings
                         self.settingsPanel()
-                        break
-                #Quit button
-                if event.type == pygame.MOUSEBUTTONDOWN:
-                    mouse = pygame.mouse.get_pos()
-                    if mouse[0] > 980 and mouse[1] > 670 and mouse[1] < 720 and mouse[0] < 1080:
-                        running = False
                         break
                 #RDFS GEN button
                 if event.type == pygame.MOUSEBUTTONDOWN:
@@ -141,7 +150,7 @@ class GUI(Ui):
                         self._RDFS.run()
                         genStack = self._RDFS.getGen
                         #genStack = [("N",14,14)]
-                        print(genStack)
+                        #print(genStack)
                         self.drawMaze(self._mazeGen.getMazeMap)
                         #self.drawMazeGen(genStack)
                 #HuntAndKill gen button
@@ -163,6 +172,11 @@ class GUI(Ui):
                         rdfsSearch = self._DFS.getSearch
                         rdfsSolve = self._DFS.getSolution
                         rdfsSolve.reverse()
+                        '''
+                        if stepButton == True:
+                            self.drawMazeSolveStep(self._mazeGen.getMazeMap, rdfsSearch, rdfsSolve, self._searchTime, self._solveTime)
+                            rdfsSolve.pop()[0]
+                        '''
                         self.drawMazeSolve(self._mazeGen.getMazeMap, rdfsSearch, rdfsSolve, self._searchTime, self._solveTime)
                 #Solve AStar Button
                 if event.type == pygame.MOUSEBUTTONDOWN:
@@ -203,8 +217,6 @@ class GUI(Ui):
                         self._Dijkstra.run()
                         DijkstraSearch = self._Dijkstra.getSolution[0]
                         DijkstraSolve = self._Dijkstra.getSolution[1]
-                        print(DijkstraSearch)
-                        print(DijkstraSolve)
                         #self.drawMaze(self._mazeGen.getMazeMap)
                         self.drawMazeSolve(self._mazeGen.getMazeMap, DijkstraSearch, DijkstraSolve, self._searchTime, self._solveTime)
                 #Generate new maze button
@@ -221,6 +233,10 @@ class GUI(Ui):
                     if mouse[0] > 980 and mouse[1] > 320 and mouse[1] < 370 and mouse[0] < 1080:
                         self._mazeGen.setMazeMap(copy.deepcopy(self._mazeGen.getTempMaze))
                         self.drawMaze(self._mazeGen.getTempMaze)
+                #Pause button
+                #if event.type == pygame.MOUSEBUTTONDOWN:
+                    #mouse = pygame.mouse.get_pos()
+                    #if mouse[0] > 980 and mouse[1] > 170 and mouse[1] < 220 and mouse[0] < 1080:
         pygame.quit()
         #This line allows to close and reopen the window
         #self._mazeScreen = pygame.display.set_mode((1080, 720), flags=pygame.HIDDEN)
@@ -248,9 +264,9 @@ class GUI(Ui):
             y += 1
             for _ in range(self._width): # widths
                 if mazeMap[x+1,y+1]["Type"] == 3:
-                    pygame.draw.rect(self._mazeScreen, self._blue, ((x*55)+10,(y*55)+10,55,55))
+                    pygame.draw.rect(self._mazeScreen, self._white, ((x*55)+10,(y*55)+10,55,55))
                 elif mazeMap[x+1,y+1]["Type"] == 4:
-                    pygame.draw.rect(self._mazeScreen, self._red, ((x*55)+10,(y*55)+10,55,55))
+                    pygame.draw.rect(self._mazeScreen, self._white, ((x*55)+10,(y*55)+10,55,55))
                 elif mazeMap[x+1,y+1]["Type"] == 0:
                     pygame.draw.rect(self._mazeScreen, self._white, ((x*55)+10,(y*55)+10,55,55))
                 elif mazeMap[x+1,y+1]["Type"] == 1:
@@ -261,6 +277,10 @@ class GUI(Ui):
                     pygame.draw.rect(self._mazeScreen, (255,0,50), ((x*55)+10,(y*55)+10,55,55))
                 self.drawWalls(mazeMap)
                 if self._isGeneration == True:
+                    if mazeMap[x+1,y+1]["Type"] == 3:
+                        pygame.draw.rect(self._mazeScreen, self._blue, ((x*55)+10,(y*55)+10,55,55))
+                    elif mazeMap[x+1,y+1]["Type"] == 4:
+                        pygame.draw.rect(self._mazeScreen, self._red, ((x*55)+10,(y*55)+10,55,55))
                     if mazeMap[x+1,y+1]["N"] == 0:
                         pygame.draw.rect(self._mazeScreen, self._white, ((x*55)+10,((y*50)+(y-1)*5)+10,50,5))
                     if mazeMap[x+1,y+1]["S"] == 0:
@@ -303,13 +323,15 @@ class GUI(Ui):
             tempCell = cell
             pygame.draw.rect(self._mazeScreen, (255,0,50), ((cell[0]*55)-45,(cell[1]*55)-45,55,55))
             self.drawWalls(mazeMap)
-            time.sleep(searchTime)
+            #time.sleep(searchTime)
+            pygame.time.wait(int(searchTime*100))
             if searchTime != 0:
                 pygame.display.update()
         for cell in solvePath:
             pygame.draw.rect(self._mazeScreen, (255,0,50), ((cell[0]*55)-45,(cell[1]*55)-45,55,55))
             self.drawWalls(mazeMap)
-            time.sleep(solveTime)
+            #time.sleep(solveTime)
+            pygame.time.wait(int(solveTime*100))
             if solveTime != 0:
                 pygame.display.update()
         pygame.display.update()
@@ -340,7 +362,8 @@ class GUI(Ui):
         self.solveRHWButton(self._mazeScreen, self._black ,(980, 370,100, 50), "RHW")
         self.solveDijkstraButton(self._mazeScreen, self._black ,(980, 220,100, 50), "Dijkstra")
         self.clearSolveButton(self._mazeScreen, self._black ,(980, 320,100, 50), "Clear Solve")
-    
+        self.pauseButton(self._mazeScreen, self._black ,(980, 170,100, 50), "Pause")
+
     def quitButton(self, screen, colour, pos, text:str):
         quitButton = pygame.draw.rect(screen, colour, pos)
         quitText = self._font.render(text, True, (0,0,255))
@@ -391,6 +414,11 @@ class GUI(Ui):
         clearText = self._font.render(text, True, (255,0,0))
         screen.blit(clearText, clearText.get_rect(center=clearButton.center))
 
+    def pauseButton(self, screen, colour, pos, text:str):
+        pauseButton = pygame.draw.rect(screen, colour, pos)
+        pauseText = self._font.render(text, True, (255,0,0))
+        screen.blit(pauseText, pauseText.get_rect(center=pauseButton.center))
+
     def settingsButton(self, screen, img, pos):
         screen.blit(img, pos)
 
@@ -421,16 +449,10 @@ class GUI(Ui):
     def createAccount(self):
         ...
     
-    def startButton(self):
-        ...
-    
     def stepForwardButton(self):
         ...
     
     def stepBackwardButton(self):
-        ...
-
-    def pauseButton(self):
         ...
     
     def importMaze(self):
@@ -439,12 +461,4 @@ class GUI(Ui):
     def saveMaze(self):
         ...
 
-    def widthUpdate(self):
-        ... #Both slider and textbox
-    
-    def heightUpdate(self):
-        ... #Both slider and textbox
-
-    def speedSlider(self):
-        ... #Text box or slider
     
