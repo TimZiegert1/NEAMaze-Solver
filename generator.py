@@ -318,4 +318,3 @@ class BFS(Generator):
     @property
     def getStack(self):
         return self._stack
-

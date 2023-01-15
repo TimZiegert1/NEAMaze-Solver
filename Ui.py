@@ -43,6 +43,10 @@ class GUI(Ui):
         self._font = pygame.font.Font(None, 50)
         self._main = tk.Tk()
         self._mazeScreen = pygame.display.set_mode((1375,850), flags=pygame.HIDDEN) #15 rows and 15 col is perfect fit!
+        self._xBox = self.getRescaleValue(self._width, self._height)[0]
+        self._yBox = self.getRescaleValue(self._width, self._height)[1]
+        self._xWall = self.getRescaleValue(self._width, self._height)[2]
+        self._yWall = self.getRescaleValue(self._width, self._height)[3]
 
     def run(self):
         self.startPanel()
@@ -134,8 +138,8 @@ class GUI(Ui):
     def mazePanel(self):
         self._mazeScreen = pygame.display.set_mode((1375,850), flags=pygame.SHOWN)
         self._mazeScreen.fill((255,255,255))
-        self.drawButtons()
         self.drawMaze(self._mazeGen.getMazeMap)
+        self.drawButtons()
         #self.drawMazeTest(self._mazeMap)
         #C:\Users\Tim Ziegert\AppData\Local\Programs\Python\Python310
         #self.dataBase()
@@ -268,72 +272,104 @@ class GUI(Ui):
         #self._mazeScreen = pygame.display.set_mode((1080, 720), flags=pygame.HIDDEN)
 
     def drawWalls(self,mazeMap):
+        xBox = self.getRescaleValue(self._width, self._height)[0]
+        yBox = self.getRescaleValue(self._width, self._height)[1]
+        xWall = self.getRescaleValue(self._width, self._height)[2]
+        yWall = self.getRescaleValue(self._width, self._height)[3]
         y=-1
         for _ in range(self._height): # height
             x = 0
             y += 1
             for _ in range(self._width): # widths
                 if mazeMap[x+1,y+1]["N"] == 1:
-                    pygame.draw.rect(self._mazeScreen, self._black, ((x*55)+5,((y*50)+(y-1)*5)+10,60,5))
+                    #pygame.draw.rect(self._mazeScreen, self._black, ((x*55)+5,((y*50)+(y-1)*5)+10,60,5))
+                    pygame.draw.rect(self._mazeScreen, self._black, ((x*(xBox+xWall))+(xWall),((y*yBox)+(y-1)*yWall)+(2*yWall),(xBox+(2*xWall)),xWall))
                 if mazeMap[x+1,y+1]["S"] == 1:
-                    pygame.draw.rect(self._mazeScreen, self._black, ((x*55)+5,((y*50)+(y-1)*5)+65,60,5))
+                    #pygame.draw.rect(self._mazeScreen, self._black, ((x*55)+5,((y*50)+(y-1)*5)+65,60,5))
+                    pygame.draw.rect(self._mazeScreen, self._black, ((x*(xBox+xWall))+(xWall),((y*yBox)+(y-1)*yWall)+(yBox+(3*yWall)),(xBox+(2*xWall)),xWall))
                 if mazeMap[x+1,y+1]["E"] == 1:
-                    pygame.draw.rect(self._mazeScreen, self._black, (((x*50)+(x-1)*5)+65,(y*55)+5,5,60))
+                    #pygame.draw.rect(self._mazeScreen, self._black, (((x*50)+(x-1)*5)+65,(y*55)+5,5,60))
+                    pygame.draw.rect(self._mazeScreen, self._black, (((x*xBox)+(x-1)*xWall)+(xBox+(3*xWall)),(y*(yBox+yWall))+yWall,yWall,yBox+(2*yWall)))
                 if mazeMap[x+1,y+1]["W"] == 1:
-                    pygame.draw.rect(self._mazeScreen, self._black, (((x*50)+(x-1)*5)+10,(y*55)+5,5,60))
+                    #pygame.draw.rect(self._mazeScreen, self._black, (((x*50)+(x-1)*5)+10,(y*55)+5,5,60))
+                    pygame.draw.rect(self._mazeScreen, self._black, (((x*xBox)+(x-1)*xWall)+(2*xWall),(y*(yBox+yWall))+yWall,yWall,yBox+(2*yWall)))
                 x += 1
 
     def drawMaze(self, mazeMap):
+        xBox = self.getRescaleValue(self._width, self._height)[0]
+        yBox = self.getRescaleValue(self._width, self._height)[1]
+        xWall = self.getRescaleValue(self._width, self._height)[2]
+        yWall = self.getRescaleValue(self._width, self._height)[3]
         y=-1
         for _ in range(self._height): # height
             x = 0
             y += 1
             for _ in range(self._width): # widths
                 if mazeMap[x+1,y+1]["Type"] == 3:
-                    pygame.draw.rect(self._mazeScreen, self._white, ((x*55)+10,(y*55)+10,55,55))
+                    #pygame.draw.rect(self._mazeScreen, self._white, ((x*55)+10,(y*55)+10,55,55))
+                    pygame.draw.rect(self._mazeScreen, self._white, ((x*(xBox+xWall))+(2*xWall),(y*(yBox+yWall))+(2*yWall),xBox+xWall,yBox+yWall))
                 elif mazeMap[x+1,y+1]["Type"] == 4:
-                    pygame.draw.rect(self._mazeScreen, self._white, ((x*55)+10,(y*55)+10,55,55))
+                    #pygame.draw.rect(self._mazeScreen, self._white, ((x*55)+10,(y*55)+10,55,55))
+                    pygame.draw.rect(self._mazeScreen, self._white, ((x*(xBox+xWall))+(2*xWall),(y*(yBox+yWall))+(2*yWall),xBox+xWall,yBox+yWall))
                 elif mazeMap[x+1,y+1]["Type"] == 0:
-                    pygame.draw.rect(self._mazeScreen, self._white, ((x*55)+10,(y*55)+10,55,55))
+                    #pygame.draw.rect(self._mazeScreen, self._white, ((x*55)+10,(y*55)+10,55,55))
+                    pygame.draw.rect(self._mazeScreen, self._white, ((x*(xBox+xWall))+(2*xWall),(y*(yBox+yWall))+(2*yWall),xBox+xWall,yBox+yWall))
                 elif mazeMap[x+1,y+1]["Type"] == 1:
-                    pygame.draw.rect(self._mazeScreen, self._white, ((x*55)+10,(y*55)+10,55,55))
+                    #pygame.draw.rect(self._mazeScreen, self._white, ((x*55)+10,(y*55)+10,55,55))
+                    pygame.draw.rect(self._mazeScreen, self._white, ((x*(xBox+xWall))+(2*xWall),(y*(yBox+yWall))+(2*yWall),xBox+xWall,yBox+yWall))
                 elif mazeMap[x+1,y+1]["Type"] == 5:
-                    pygame.draw.rect(self._mazeScreen, (50,50,50), ((x*55)+10,(y*55)+10,55,55))
+                    #pygame.draw.rect(self._mazeScreen, (50,50,50), ((x*55)+10,(y*55)+10,55,55))
+                    pygame.draw.rect(self._mazeScreen, (50,50,50), ((x*(xBox+xWall))+(2*xWall),(y*(yBox+yWall))+(2*yWall),xBox+xWall,yBox+yWall))
                 elif mazeMap[x+1,y+1]["Type"] == 2:
-                    pygame.draw.rect(self._mazeScreen, (255,0,50), ((x*55)+10,(y*55)+10,55,55))
+                    #pygame.draw.rect(self._mazeScreen, (255,0,50), ((x*55)+10,(y*55)+10,55,55))
+                    pygame.draw.rect(self._mazeScreen, (255,0,50), ((x*(xBox+xWall))+(2*xWall),(y*(yBox+yWall))+(2*yWall),xBox+xWall,yBox+yWall))
                 self.drawWalls(mazeMap)
                 if self._isGeneration == True:
                     if mazeMap[x+1,y+1]["Type"] == 3:
-                        pygame.draw.rect(self._mazeScreen, self._blue, ((x*55)+10,(y*55)+10,55,55))
+                        #pygame.draw.rect(self._mazeScreen, self._blue, ((x*55)+10,(y*55)+10,55,55))
+                        pygame.draw.rect(self._mazeScreen, self._blue, ((x*(xBox+xWall))+(2*xWall),(y*(yBox+yWall))+(2*yWall),xBox+xWall,yBox+yWall))
                     elif mazeMap[x+1,y+1]["Type"] == 4:
-                        pygame.draw.rect(self._mazeScreen, self._red, ((x*55)+10,(y*55)+10,55,55))
+                        #pygame.draw.rect(self._mazeScreen, self._red, ((x*55)+10,(y*55)+10,55,55))
+                        pygame.draw.rect(self._mazeScreen, self._red, ((x*(xBox+xWall))+(2*xWall),(y*(yBox+yWall))+(2*yWall),xBox+xWall,yBox+yWall))
                     if mazeMap[x+1,y+1]["N"] == 0:
-                        pygame.draw.rect(self._mazeScreen, self._white, ((x*55)+10,((y*50)+(y-1)*5)+10,50,5))
+                        #pygame.draw.rect(self._mazeScreen, self._white, ((x*55)+10,((y*50)+(y-1)*5)+10,50,5))
+                        pygame.draw.rect(self._mazeScreen, self._white, ((x*(xBox+xWall))+(2*xWall),((y*yBox)+(y-1)*yWall)+(2*yWall),xBox,yWall))
                     if mazeMap[x+1,y+1]["S"] == 0:
-                        pygame.draw.rect(self._mazeScreen, self._white, ((x*55)+10,((y*50)+(y-1)*5)+65,50,5))
+                        #pygame.draw.rect(self._mazeScreen, self._white, ((x*55)+10,((y*50)+(y-1)*5)+65,50,5))
+                        pygame.draw.rect(self._mazeScreen, self._white, ((x*(xBox+xWall))+(2*xWall),((y*yBox)+(y-1)*yWall)+yBox+(3*yWall),xBox,yWall))
                     if mazeMap[x+1,y+1]["E"] == 0:
-                        pygame.draw.rect(self._mazeScreen, self._white, (((x*50)+(x-1)*5)+65,(y*55)+10,5,50))
+                        #pygame.draw.rect(self._mazeScreen, self._white, (((x*50)+(x-1)*5)+65,(y*55)+10,5,50))
+                        pygame.draw.rect(self._mazeScreen, self._white, (((x*xBox)+(x-1)*xWall)+xBox+(3*xWall),(y*(yBox+yWall))+(2*yWall),xWall,yBox))
                     if mazeMap[x+1,y+1]["W"] == 0:
-                        pygame.draw.rect(self._mazeScreen, self._white, (((x*50)+(x-1)*5)+10,(y*55)+10,5,50)) 
+                        #pygame.draw.rect(self._mazeScreen, self._white, (((x*50)+(x-1)*5)+10,(y*55)+10,5,50)) 
+                        pygame.draw.rect(self._mazeScreen, self._white, (((x*xBox)+(x-1)*xWall)+(2*xWall),(y*(yBox+yWall))+(2*yWall),xWall,yBox)) 
                     #pygame.display.update()
                 x += 1
         pygame.display.update() #USE THIS IF YOU WANT IT TO BE INSTANT
 
     def drawMazeGen(self, path):
+        xBox = self.getRescaleValue(self._width, self._height)[0]
+        yBox = self.getRescaleValue(self._width, self._height)[1]
+        xWall = self.getRescaleValue(self._width, self._height)[2]
+        yWall = self.getRescaleValue(self._width, self._height)[3]
         for cell in path:
             if cell[0] == "S":
+                #pygame.draw.rect(self._mazeScreen, self._white, ((cell[1]*55)-45,((cell[2]*50)+(cell[2]-1)*5)+10,50,5))
                 pygame.draw.rect(self._mazeScreen, self._white, ((cell[1]*55)-45,((cell[2]*50)+(cell[2]-1)*5)+10,50,5))
                 time.sleep(0.05)
                 pygame.display.update()
             elif cell[0] == "W":
+                #pygame.draw.rect(self._mazeScreen, self._white, (((cell[1]*50)+(cell[1]-1)*5)-45,(cell[2]*55)-45,5,50)) 
                 pygame.draw.rect(self._mazeScreen, self._white, (((cell[1]*50)+(cell[1]-1)*5)-45,(cell[2]*55)-45,5,50)) 
                 time.sleep(0.05)
                 pygame.display.update()
             elif cell[0] == "E":
+                #pygame.draw.rect(self._mazeScreen, self._white, (((cell[1]*50)+(cell[1]-1)*5)+10,(cell[2]*55)-45,5,50))
                 pygame.draw.rect(self._mazeScreen, self._white, (((cell[1]*50)+(cell[1]-1)*5)+10,(cell[2]*55)-45,5,50))
                 time.sleep(0.05)
                 pygame.display.update()
             elif cell[0] == "N":
+                #pygame.draw.rect(self._mazeScreen, self._white, ((cell[1]*55)-45,((cell[2]*50)+(cell[2]-1)*5)-45,50,5))
                 pygame.draw.rect(self._mazeScreen, self._white, ((cell[1]*55)-45,((cell[2]*50)+(cell[2]-1)*5)-45,50,5))
                 time.sleep(0.05)
                 pygame.display.update()
@@ -438,6 +474,10 @@ class GUI(Ui):
                 '''
 
     def drawMazeSolve(self, mazeMap, searchPath, solvePath, searchTime = 0.15, solveTime = 0.05, index = 0):
+        xBox = self.getRescaleValue(self._width, self._height)[0]
+        yBox = self.getRescaleValue(self._width, self._height)[1]
+        xWall = self.getRescaleValue(self._width, self._height)[2]
+        yWall = self.getRescaleValue(self._width, self._height)[3]
         head = 0
         while True:
             for event in pygame.event.get():
@@ -467,8 +507,10 @@ class GUI(Ui):
                 #CAN ADD OTHER BUTTONS WANTING TO BE USED WHILE BEING SOLVED HERE
             if index < len(searchPath):
                 if head != 0:
-                    pygame.draw.rect(self._mazeScreen, (50,50,50), ((searchPath[tempIndex][0]*55)-45,(searchPath[tempIndex][1]*55)-45,55,55))
-                pygame.draw.rect(self._mazeScreen, (255,0,50), ((searchPath[index][0]*55)-45,(searchPath[index][1]*55)-45,55,55))
+                    #pygame.draw.rect(self._mazeScreen, (50,50,50), ((searchPath[tempIndex][0]*55)-45,(searchPath[tempIndex][1]*55)-45,55,55))
+                    pygame.draw.rect(self._mazeScreen, (50,50,50), ((searchPath[tempIndex][0]*(xBox+xWall))-(xBox-xWall),(searchPath[tempIndex][1]*(yBox+yWall))-(yBox-yWall),xBox+xWall,yBox+yWall))
+                #pygame.draw.rect(self._mazeScreen, (255,0,50), ((searchPath[index][0]*55)-45,(searchPath[index][1]*55)-45,55,55))
+                pygame.draw.rect(self._mazeScreen, (255,0,50), ((searchPath[index][0]*(xBox+xWall))-(xBox-xWall),(searchPath[index][1]*(yBox+yWall))-(yBox-yWall),xBox+xWall,yBox+yWall))
                 tempIndex = index
                 self.drawWalls(mazeMap)
                 #time.sleep(searchTime)
@@ -480,7 +522,8 @@ class GUI(Ui):
                 index = 0
                 while True:
                     if index < len(solvePath):
-                        pygame.draw.rect(self._mazeScreen, (255,0,50), ((solvePath[index][0]*55)-45,(solvePath[index][1]*55)-45,55,55))
+                        #pygame.draw.rect(self._mazeScreen, (255,0,50), ((solvePath[index][0]*55)-45,(solvePath[index][1]*55)-45,55,55))
+                        pygame.draw.rect(self._mazeScreen, (255,0,50), ((solvePath[index][0]*(xBox+xWall))-(xBox-xWall),(solvePath[index][1]*(yBox+yWall))-(yBox-yWall),xBox+xWall,yBox+yWall))
                         self.drawWalls(mazeMap)
                         #time.sleep(solveTime)
                         pygame.time.wait(int(solveTime*100))
