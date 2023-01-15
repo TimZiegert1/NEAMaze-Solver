@@ -53,6 +53,13 @@ class Solver:
         nextMove.append(random.choice(self.checkNeighCells(x, y)))
         return (nextMove[0][0], nextMove[0][1])
 
+############################################
+#                                          #
+#     CATEGORY A SKILL: RECURSION          #
+#     CATEGORY A SKILL: LIST OPERATION     #
+#                                          #
+############################################
+
 class DFS(Solver):
     def __init__(self, mazeGen):
         super().__init__(mazeGen)
@@ -112,6 +119,14 @@ class DFS(Solver):
     @property
     def getSearch(self):
         return self._tempStackSearched
+
+############################################################
+#                                                          #
+#     CATEGORY A SKILL: RECURSION                          #
+#     CATEGORY A SKILL: LIST OPERATION                     #
+#     CATEGORY A SKILL: COMPLEX USER-DEFINED ALGORITHM     #
+#                                                          #
+############################################################
 
 class AStar(Solver):
     def __init__(self, mazeGen: MazeGen):

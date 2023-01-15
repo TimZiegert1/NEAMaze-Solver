@@ -5,6 +5,7 @@ import tkinter as tk
 import pygame
 import copy
 import time
+import mysql.connector
 class Ui:
     def __init__(self):
         #self._clock = pygame.time.Clock()
@@ -20,6 +21,12 @@ class Ui:
         self._solveTime = 0.05
         self._isPaused = False
         self._isGeneration = False
+        self.mydb = mysql.connector.connect(
+            host="localhost",
+            user="Test",
+            password="Test",
+            database="Maze"
+        )
 
 class Terminal(Ui):
     def __init__(self):
@@ -47,6 +54,15 @@ class GUI(Ui):
         helpButton.grid(row=1,column=0)
         quitButton.grid(row=2, column=0)
         self._main.mainloop()
+
+    def dataBase(self):
+        '''
+        self._database = tk.Tk()
+        self._database.deiconify()
+        self._database.title("Database")
+        self._database.mainloop()
+        '''
+        print(self.mydb)
 
     def settingsPanel(self):
         self._settings = tk.Tk()
@@ -119,6 +135,8 @@ class GUI(Ui):
         self.drawButtons()
         self.drawMaze(self._mazeGen.getMazeMap)
         #self.drawMazeTest(self._mazeMap)
+        #C:\Users\Tim Ziegert\AppData\Local\Programs\Python\Python310
+        self.dataBase()
         pygame.display.update()
         running = True
         while running:
