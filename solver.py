@@ -336,6 +336,3 @@ class RHW(Solver):
             self._mazeMap[cell[0], cell[1]]["Type"] = 5
         self._mazeMap[self._startPos[0], self._startPos[1]]["Type"] = 3
         self._mazeMap[self._endPos[0], self._endPos[1]]["Type"] = 4
-
-
-

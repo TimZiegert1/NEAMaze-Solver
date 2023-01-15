@@ -21,12 +21,14 @@ class Ui:
         self._solveTime = 0.05
         self._isPaused = False
         self._isGeneration = False
+        '''
         self.mydb = mysql.connector.connect(
             host="localhost",
             user="Test",
             password="Test",
             database="Maze"
         )
+        '''
 
 class Terminal(Ui):
     def __init__(self):
@@ -55,14 +57,14 @@ class GUI(Ui):
         quitButton.grid(row=2, column=0)
         self._main.mainloop()
 
-    def dataBase(self):
+    #def dataBase(self):
         '''
         self._database = tk.Tk()
         self._database.deiconify()
         self._database.title("Database")
         self._database.mainloop()
         '''
-        print(self.mydb)
+        #print(self.mydb)
 
     def settingsPanel(self):
         self._settings = tk.Tk()
@@ -136,7 +138,7 @@ class GUI(Ui):
         self.drawMaze(self._mazeGen.getMazeMap)
         #self.drawMazeTest(self._mazeMap)
         #C:\Users\Tim Ziegert\AppData\Local\Programs\Python\Python310
-        self.dataBase()
+        #self.dataBase()
         pygame.display.update()
         running = True
         while running:
@@ -203,8 +205,10 @@ class GUI(Ui):
                         self._isGeneration = False
                         self._AStar = AStar(self._mazeGen)
                         self._AStar.run()
-                        AStarSearch = self._AStar.getSolution[0]
-                        AStarSolve = self._AStar.getSolution[1]
+                        #AStarSearch = self._AStar.getSolution[0]
+                        AStarSearch = [x for x in self._AStar.getSolution[0]]
+                        #AStarSolve = self._AStar.getSolution[1]
+                        AStarSolve = [x for x in self._AStar.getSolution[1]]
                         #self.drawMaze(self._mazeGen.getMazeMap)
                         self.drawMazeSolve(self._mazeGen.getMazeMap, AStarSearch, AStarSolve, self._searchTime, self._solveTime)
                 #Solve BFS Button
@@ -214,8 +218,10 @@ class GUI(Ui):
                         self._isGeneration = False
                         self._BFS = BFS(self._mazeGen)
                         self._BFS.run()
-                        BFSSearch = self._BFS.getSolution[0]
-                        BFSSolve = self._BFS.getSolution[1]
+                        #BFSSearch = self._BFS.getSolution[0]
+                        BFSSearch = [x for x in self._BFS.getSolution[0]]
+                        #BFSSolve = self._BFS.getSolution[1]
+                        BFSSolve = [x for x in self._BFS.getSolution[1]]
                         #self.drawMaze(self._mazeGen.getMazeMap)
                         self.drawMazeSolve(self._mazeGen.getMazeMap, BFSSearch, BFSSolve, self._searchTime, self._solveTime)
                 #Solve RHW Button
@@ -233,8 +239,10 @@ class GUI(Ui):
                         self._isGeneration = False
                         self._Dijkstra = Dijkstra(self._mazeGen)
                         self._Dijkstra.run()
-                        DijkstraSearch = self._Dijkstra.getSolution[0]
-                        DijkstraSolve = self._Dijkstra.getSolution[1]
+                        #DijkstraSearch = self._Dijkstra.getSolution[0]
+                        DijkstraSearch = [x for x in self._Dijkstra.getSolution[0]]
+                        #DijkstraSolve = self._Dijkstra.getSolution[1]
+                        DijkstraSolve = [x for x in self._Dijkstra.getSolution[1]]
                         #self.drawMaze(self._mazeGen.getMazeMap)
                         self.drawMazeSolve(self._mazeGen.getMazeMap, DijkstraSearch, DijkstraSolve, self._searchTime, self._solveTime)
                 #Generate new maze button
@@ -331,7 +339,7 @@ class GUI(Ui):
                 pygame.display.update()
             elif cell == "Dead End":
                 pass
-
+    '''
     def drawMazeSolve(self, mazeMap, searchPath, solvePath, searchTime = 0.15, solveTime = 0.05):
         count = 0
         for cell in searchPath:
@@ -353,7 +361,89 @@ class GUI(Ui):
             if solveTime != 0:
                 pygame.display.update()
         pygame.display.update()
+        '''
 
+    def pause(self):
+        pause = True
+        while pause:
+            for event in pygame.event.get():
+                # can either run the step button from here or from below
+                #if run from here then the game is paused then step works but have to explain that
+                #if run from below then can call paused and then step, this will probably work better
+                #you have to make it so that step can also be called from the very start
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    mouse = pygame.mouse.get_pos()
+                    if mouse[0] > 980 and mouse[1] > 170 and mouse[1] < 220 and mouse[0] < 1080:
+                        self.drawPauseButton()
+                        pause = False
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_SPACE:
+                        self.drawPauseButton()
+                        pause = False
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    mouse = pygame.mouse.get_pos()
+                    if mouse[0] > 980 and mouse[1] > 670 and mouse[1] < 720 and mouse[0] < 1080:
+                        pygame.quit()
+                        quit()
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    mouse = pygame.mouse.get_pos()
+                    if mouse[0] > 1290 and mouse[1] > 10 and mouse[1] < 85 and mouse[0] < 1365:
+                        print("settings")
+                        #run settings
+                        self.settingsPanel()
+            #THIS MAKES SO CAN USE BUTTONS IN PAUSE
+                '''
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    mouse = pygame.mouse.get_pos()
+                    if mouse[0] > 980 and mouse[1] > 620 and mouse[1] < 670 and mouse[0] < 1080:
+                        self._mazeGen.setMazeMap = {}
+                        self._mazeGen = MazeGen(self._height, self._width)
+                        self.drawMaze(self._mazeGen.getMazeMap)
+                        pause = False
+                    if event.type == pygame.MOUSEBUTTONDOWN:
+                        mouse = pygame.mouse.get_pos()
+                        if mouse[0] > 980 and mouse[1] > 320 and mouse[1] < 370 and mouse[0] < 1080:
+                            self._mazeGen.setMazeMap(copy.deepcopy(self._mazeGen.getTempMaze))
+                            self.drawMaze(self._mazeGen.getTempMaze)
+                            pause = False
+                '''
+
+    def drawMazeSolve(self, mazeMap, searchPath, solvePath, searchTime = 0.15, solveTime = 0.05):
+        index = 0
+        head = 0
+        while True:
+            for event in pygame.event.get():
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    mouse = pygame.mouse.get_pos()
+                    if mouse[0] > 980 and mouse[1] > 170 and mouse[1] < 220 and mouse[0] < 1080:
+                        self.unPauseButton()
+                        self.pause()
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_SPACE:
+                        self.unPauseButton()
+                        self.pause()
+            if index < len(searchPath):
+                if head != 0:
+                    pygame.draw.rect(self._mazeScreen, (50,50,50), ((searchPath[tempIndex][0]*55)-45,(searchPath[tempIndex][1]*55)-45,55,55))
+                pygame.draw.rect(self._mazeScreen, (255,0,50), ((searchPath[index][0]*55)-45,(searchPath[index][1]*55)-45,55,55))
+                tempIndex = index
+                self.drawWalls(mazeMap)
+                time.sleep(searchTime)
+                pygame.display.update()
+                head = 1
+                index += 1
+            else:
+                index = 0
+                while True:
+                    if index < len(solvePath):
+                        pygame.draw.rect(self._mazeScreen, (255,0,50), ((solvePath[index][0]*55)-45,(solvePath[index][1]*55)-45,55,55))
+                        self.drawWalls(mazeMap)
+                        time.sleep(solveTime)
+                        pygame.display.update()
+                        index += 1
+                    else:
+                        break
+                break
 
     #Paste rescale code here to test
 
@@ -436,6 +526,14 @@ class GUI(Ui):
         pauseButton = pygame.draw.rect(screen, colour, pos)
         pauseText = self._font.render(text, True, (255,0,0))
         screen.blit(pauseText, pauseText.get_rect(center=pauseButton.center))
+
+    def drawPauseButton(self):
+        self.pauseButton(self._mazeScreen, self._black ,(980, 170,200, 50), "Pause")
+
+    def unPauseButton(self):
+        pauseButton = pygame.draw.rect(self._mazeScreen, self._black, (980, 170,100, 50))
+        pauseText = self._font.render("unpause", True, (255,0,0))
+        self._mazeScreen.blit(pauseText, pauseText.get_rect(center=pauseButton.center))
 
     def settingsButton(self, screen, img, pos):
         screen.blit(img, pos)
