@@ -42,6 +42,7 @@ class GUI(Ui):
         pygame.init()
         #Use either 15x15 or 25x25, these work best with the screen size
         self._font = pygame.font.Font(None, 50)
+        self._font2 = pygame.font.Font(None, 30)
         self._main = tk.Tk()
         self._mazeScreen = pygame.display.set_mode((1375,850), flags=pygame.HIDDEN) #15 rows and 15 col is perfect fit!
         self._xBox = self.getRescaleValue(self._width, self._height)[0]
@@ -152,13 +153,15 @@ class GUI(Ui):
         running = True
         while running:
             for event in pygame.event.get():
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    print(pygame.mouse.get_pos())
                 if event.type == pygame.QUIT:
                     running = False
                     break
                 #Quit button
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     mouse = pygame.mouse.get_pos()
-                    if mouse[0] > 980 and mouse[1] > 670 and mouse[1] < 720 and mouse[0] < 1080:
+                    if mouse[0] > 1280 and mouse[1] > 790 and mouse[1] < 840 and mouse[0] < 1380:
                         running = False
                         break
                 if event.type == pygame.MOUSEBUTTONDOWN:
@@ -268,10 +271,7 @@ class GUI(Ui):
                     if mouse[0] > 980 and mouse[1] > 320 and mouse[1] < 370 and mouse[0] < 1080:
                         self._mazeGen.setMazeMap(copy.deepcopy(self._mazeGen.getTempMaze))
                         self.drawMaze(self._mazeGen.getTempMaze)
-                #Pause button
-                #if event.type == pygame.MOUSEBUTTONDOWN:
-                    #mouse = pygame.mouse.get_pos()
-                    #if mouse[0] > 980 and mouse[1] > 170 and mouse[1] < 220 and mouse[0] < 1080:
+                
         pygame.quit()
         #This line allows to close and reopen the window
         #self._mazeScreen = pygame.display.set_mode((1080, 720), flags=pygame.HIDDEN)
@@ -399,7 +399,7 @@ class GUI(Ui):
                         return index
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     mouse = pygame.mouse.get_pos()
-                    if mouse[0] > 980 and mouse[1] > 670 and mouse[1] < 720 and mouse[0] < 1080:
+                    if mouse[0] > 1280 and mouse[1] > 790 and mouse[1] < 840 and mouse[0] < 1380:
                         pygame.quit()
                         quit()
                 if event.type == pygame.MOUSEBUTTONDOWN:
@@ -550,8 +550,11 @@ class GUI(Ui):
 
 
     def drawButtons(self):
+        pygame.draw.rect(self._mazeScreen, self._black ,(850,100,500,400))
+        pygame.draw.rect(self._mazeScreen, self._white ,(855,105,490,390))
+        self._mazeScreen.blit(self._font2.render("Time Taken", True, (255,0,0)), (850,10))
+        self.quitButton(self._mazeScreen, self._white ,(1270, 790,100, 50), "Quit")
         self.settingsButton(self._mazeScreen, pygame.image.load("settingsIcon.png"),(1290, 10))
-        self.quitButton(self._mazeScreen, self._black ,(980, 670,100, 50), "Quit")
         self.clearButton(self._mazeScreen, self._black ,(980, 620,100, 50), "Clear")
         self.rdfsGenButton(self._mazeScreen, self._black ,(980, 570,100, 50), "RDFS Gen")
         self.huntAndKillButton(self._mazeScreen, self._black ,(980, 270,100, 50), "Hunt and Kill")
@@ -564,11 +567,12 @@ class GUI(Ui):
         self.pauseButton(self._mazeScreen, self._black ,(980, 170,100, 50), "Pause")
         self.stepButton(self._mazeScreen, self._black ,(980, 120,100, 50), "Step")
         self.stepBackwardButton(self._mazeScreen, self._black ,(980, 70,100, 50), "Step Back")
+        self.labels()
 
 
     def quitButton(self, screen, colour, pos, text:str):
         quitButton = pygame.draw.rect(screen, colour, pos)
-        quitText = self._font.render(text, True, (0,0,255))
+        quitText = self._font.render(text, True, (255,0,0))
         screen.blit(quitText, quitText.get_rect(center=quitButton.center))
 
     def rdfsGenButton(self, screen, colour, pos, text:str):
@@ -655,8 +659,8 @@ class GUI(Ui):
     def settingsButton(self, screen, img, pos):
         screen.blit(img, pos)
 
-    def labels(self):
-        ... #Labels for the maze
+    def labels(self, timeNum=0):
+        self._mazeScreen.blit(self._font.render((f"{timeNum}"), True, (255,0,0)), (850,45))
 
     def pickGen(self):
         ... #Drop down of all maze Generation algorithms
