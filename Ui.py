@@ -17,6 +17,8 @@ class Ui:
         self._green = (0, 255, 0)
         self._red = ( 255, 0, 0)
         self._blue = (0,0,255)
+        self._bColour = (225,225,225)
+        self._hColour = (0,195,195)
         self._searchTime = 0.15
         self._solveTime = 0.05
         self._isPaused = False
@@ -42,6 +44,8 @@ class GUI(Ui):
         pygame.init()
         #Use either 15x15 or 25x25, these work best with the screen size
         self._font = pygame.font.Font(None, 50)
+        self._font1 = pygame.font.Font(None, 40)
+        self._fontDij = pygame.font.Font(None, 37)
         self._font2 = pygame.font.Font(None, 30)
         self._main = tk.Tk()
         self._mazeScreen = pygame.display.set_mode((1375,850), flags=pygame.HIDDEN) #15 rows and 15 col is perfect fit!
@@ -196,46 +200,39 @@ class GUI(Ui):
                 #Solve DFS Button
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     mouse = pygame.mouse.get_pos()
-                    if mouse[0] > 980 and mouse[1] > 520 and mouse[1] < 570 and mouse[0] < 1080:
+                    if mouse[0] > 885 and mouse[1] > 145 and mouse[1] < 205 and mouse[0] < 995:
                         self._isGeneration = False
                         self._DFS = DFS(self._mazeGen)
                         self._DFS.run()
-                        #self.drawMaze(self._mazeGen.getMazeMap) # THIS TO PRINT INSTANTLY
                         rdfsSearch = self._DFS.getSearch
                         rdfsSolve = self._DFS.getSolution
                         rdfsSolve.reverse()
-                        '''
-                        if stepButton == True:
-                            self.drawMazeSolveStep(self._mazeGen.getMazeMap, rdfsSearch, rdfsSolve, self._searchTime, self._solveTime)
-                            rdfsSolve.pop()[0]
-                        '''
+                        self.labels(self._DFS.getTimeTaken, len(rdfsSearch), len(rdfsSolve))
                         self.drawMazeSolve(self._mazeGen.getMazeMap, rdfsSearch, rdfsSolve, self._searchTime, self._solveTime)
-                #Solve AStar Button
-                if event.type == pygame.MOUSEBUTTONDOWN:
-                    mouse = pygame.mouse.get_pos()
-                    if mouse[0] > 980 and mouse[1] > 470 and mouse[1] < 520 and mouse[0] < 1080:
-                        self._isGeneration = False
-                        self._AStar = AStar(self._mazeGen)
-                        self._AStar.run()
-                        #AStarSearch = self._AStar.getSolution[0]
-                        AStarSearch = [x for x in self._AStar.getSolution[0]]
-                        #AStarSolve = self._AStar.getSolution[1]
-                        AStarSolve = [x for x in self._AStar.getSolution[1]]
-                        #self.drawMaze(self._mazeGen.getMazeMap)
-                        self.drawMazeSolve(self._mazeGen.getMazeMap, AStarSearch, AStarSolve, self._searchTime, self._solveTime)
                 #Solve BFS Button
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     mouse = pygame.mouse.get_pos()
-                    if mouse[0] > 980 and mouse[1] > 420 and mouse[1] < 470 and mouse[0] < 1080:
+                    if mouse[0] > 1045 and mouse[1] > 145 and mouse[1] < 205 and mouse[0] < 1155:
                         self._isGeneration = False
                         self._BFS = BFS(self._mazeGen)
                         self._BFS.run()
-                        #BFSSearch = self._BFS.getSolution[0]
                         BFSSearch = [x for x in self._BFS.getSolution[0]]
-                        #BFSSolve = self._BFS.getSolution[1]
                         BFSSolve = [x for x in self._BFS.getSolution[1]]
+                        self.labels(self._BFS.getTimeTaken, len(BFSSearch), len(BFSSolve))
                         #self.drawMaze(self._mazeGen.getMazeMap)
                         self.drawMazeSolve(self._mazeGen.getMazeMap, BFSSearch, BFSSolve, self._searchTime, self._solveTime)
+                #Solve AStar Button
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    mouse = pygame.mouse.get_pos()
+                    if mouse[0] > 885 and mouse[1] > 215 and mouse[1] < 275 and mouse[0] < 995:
+                        self._isGeneration = False
+                        self._AStar = AStar(self._mazeGen)
+                        self._AStar.run()
+                        AStarSearch = [x for x in self._AStar.getSolution[0]]
+                        AStarSolve = [x for x in self._AStar.getSolution[1]]
+                        self.labels(self._AStar.getTimeTaken, len(AStarSearch), len(AStarSolve))
+                        #self.drawMaze(self._mazeGen.getMazeMap)
+                        self.drawMazeSolve(self._mazeGen.getMazeMap, AStarSearch, AStarSolve, self._searchTime, self._solveTime)
                 #Solve RHW Button
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     mouse = pygame.mouse.get_pos()
@@ -247,14 +244,13 @@ class GUI(Ui):
                 #Dijkstra Button
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     mouse = pygame.mouse.get_pos()  
-                    if mouse[0] > 980 and mouse[1] > 220 and mouse[1] < 270 and mouse[0] < 1080:
+                    if mouse[0] > 1205 and mouse[1] > 145 and mouse[1] < 205 and mouse[0] < 1315:
                         self._isGeneration = False
                         self._Dijkstra = Dijkstra(self._mazeGen)
                         self._Dijkstra.run()
-                        #DijkstraSearch = self._Dijkstra.getSolution[0]
                         DijkstraSearch = [x for x in self._Dijkstra.getSolution[0]]
-                        #DijkstraSolve = self._Dijkstra.getSolution[1]
                         DijkstraSolve = [x for x in self._Dijkstra.getSolution[1]]
+                        self.labels(self._Dijkstra.getTimeTaken, len(DijkstraSearch), len(DijkstraSolve))
                         #self.drawMaze(self._mazeGen.getMazeMap)
                         self.drawMazeSolve(self._mazeGen.getMazeMap, DijkstraSearch, DijkstraSolve, self._searchTime, self._solveTime)
                 #Generate new maze button
@@ -271,6 +267,29 @@ class GUI(Ui):
                     if mouse[0] > 980 and mouse[1] > 320 and mouse[1] < 370 and mouse[0] < 1080:
                         self._mazeGen.setMazeMap(copy.deepcopy(self._mazeGen.getTempMaze))
                         self.drawMaze(self._mazeGen.getTempMaze)
+                #Hovers
+                if event.type == pygame.MOUSEMOTION:
+                    mouse = pygame.mouse.get_pos()
+                    if mouse[0] > 885 and mouse[1] > 145 and mouse[1] < 205 and mouse[0] < 995:
+                        self.solveRDFSHover()
+                    else:
+                        self.solveRDFSButton(self._mazeScreen, (225,225,225) ,(890, 150,100, 50), "RDFS")
+                        pygame.display.update()
+                    if mouse[0] > 1045 and mouse[1] > 145 and mouse[1] < 205 and mouse[0] < 1155:
+                        self.solveBFSHover()
+                    else:
+                        self.solveBFSButton(self._mazeScreen, self._bColour ,(1050, 150,100, 50), "BFS")
+                        pygame.display.update()
+                    if mouse[0] > 1205 and mouse[1] > 145 and mouse[1] < 205 and mouse[0] < 1315:
+                        self.solveDijkstraHover()
+                    else:
+                        self.solveDijkstraButton(self._mazeScreen, self._bColour ,(1210, 150,100, 50), "Dijkstra")
+                    if mouse[0] > 885 and mouse[1] > 215 and mouse[1] < 275 and mouse[0] < 995:
+                        self.solveAStarHover()
+                    else:
+                        self.solveAStarButton(self._mazeScreen, self._bColour ,(890, 220,100, 50), "A*")
+                        pygame.display.update()
+
                 
         pygame.quit()
         #This line allows to close and reopen the window
@@ -557,8 +576,14 @@ class GUI(Ui):
 
 
     def drawButtons(self):
+        #Solve Border
         pygame.draw.rect(self._mazeScreen, self._black ,(850,100,500,350))
         pygame.draw.rect(self._mazeScreen, self._white ,(855,105,490,340))
+        self._mazeScreen.blit(self._font.render("Solve", True, (0,0,0)), (1050,110))
+        #Gen Border
+        pygame.draw.rect(self._mazeScreen, self._black ,(850,455,500,300))
+        pygame.draw.rect(self._mazeScreen, self._white ,(855,460,490,290))
+        self._mazeScreen.blit(self._font.render("Generate", True, (0,0,0)), (1025,465))
 
         self._mazeScreen.blit(self._font2.render("Time Taken", True, (0,0,0)), (850,10))
         self._mazeScreen.blit(self._font2.render("Searched Cells", True, (0,0,0)), (980,10))
@@ -566,7 +591,7 @@ class GUI(Ui):
         self.labels()   
 
         self.settingsButton(self._mazeScreen, pygame.image.load("img\settingsIcon.png") ,(1290, 10))
-        self.pauseButton(self._mazeScreen, pygame.image.load("img\pause.jpg") ,(1075, 780))
+        self.pauseButton(self._mazeScreen, pygame.image.load("img\pause.png") ,(1075, 780))
         self.stepButton(self._mazeScreen, pygame.image.load("img\stepButton.png") ,(1150, 780))
         self.stepBackButton(self._mazeScreen, pygame.image.load("img\stepBackButton.png") ,(1000, 780))
 
@@ -574,11 +599,12 @@ class GUI(Ui):
         self.clearButton(self._mazeScreen, self._black ,(980, 620, 100, 50), "Clear")
         self.rdfsGenButton(self._mazeScreen, self._black ,(980, 570,100, 50), "RDFS Gen")
         self.huntAndKillButton(self._mazeScreen, self._black ,(980, 270,100, 50), "Hunt and Kill")
-        self.solveRDFSButton(self._mazeScreen, self._black ,(980, 520,100, 50), "Solve")
-        self.solveAStarButton(self._mazeScreen, self._black ,(980, 470,100, 50), "A*")
-        self.solveBFSButton(self._mazeScreen, self._black ,(980, 420,100, 50), "BFS")
+
+        self.solveRDFSButton(self._mazeScreen, self._bColour ,(890, 150,100, 50), "RDFS")
+        self.solveBFSButton(self._mazeScreen, self._bColour ,(1050, 150,100, 50), "BFS")
+        self.solveDijkstraButton(self._mazeScreen, self._bColour ,(1210, 150,100, 50), "Dijkstra")
+        self.solveAStarButton(self._mazeScreen, self._bColour ,(890, 220,100, 50), "A*")
         self.solveRHWButton(self._mazeScreen, self._black ,(980, 370,100, 50), "RHW")
-        self.solveDijkstraButton(self._mazeScreen, self._black ,(980, 220,100, 50), "Dijkstra")
         self.clearSolveButton(self._mazeScreen, self._black ,(980, 320,100, 50), "Clear Solve")
 
 
@@ -587,8 +613,57 @@ class GUI(Ui):
         quitText = self._font.render(text, True, (255,0,0))
         screen.blit(quitText, quitText.get_rect(center=quitButton.center))
 
+    def solveRDFSButton(self, screen, colour, pos, text:str):
+        pygame.draw.rect(screen, self._black, (885,145,110,60), border_radius=18)
+        solveButton = pygame.draw.rect(screen, colour, pos, border_radius=15)
+        solveText = self._font1.render(text, True, (0,0,0))
+        screen.blit(solveText, solveText.get_rect(center=solveButton.center))
+    
+    def solveRDFSHover(self):
+        #pygame.draw.rect(self._mazeScreen, self._black, (885,145,110,60), border_radius=18)
+        solveButton = pygame.draw.rect(self._mazeScreen, self._hColour,(890, 150,100, 50), border_radius=15)
+        solveText = self._font1.render("RDFS", True, (0,0,0))
+        self._mazeScreen.blit(solveText, solveText.get_rect(center=solveButton.center))
+        pygame.display.update()
+
+    def solveBFSButton(self, screen, colour, pos, text:str):
+        pygame.draw.rect(screen, self._black, (1045,145,110,60), border_radius=18)
+        solveButton = pygame.draw.rect(screen, colour, pos, border_radius=15)
+        solveText = self._font1.render(text, True, (0,0,0))
+        screen.blit(solveText, solveText.get_rect(center=solveButton.center))
+
+    def solveBFSHover(self):
+        solveButton = pygame.draw.rect(self._mazeScreen, self._hColour, (1050, 150,100, 50), border_radius=15)
+        solveText = self._font1.render("BFS", True, (0,0,0))
+        self._mazeScreen.blit(solveText, solveText.get_rect(center=solveButton.center))
+        pygame.display.update()
+    
+    def solveDijkstraButton(self, screen, colour, pos, text:str):
+        pygame.draw.rect(screen, self._black, (1205,145,110,60), border_radius=18)
+        solveButton = pygame.draw.rect(screen, colour, pos, border_radius=15)
+        solveText = self._fontDij.render(text, True, (0,0,0))
+        screen.blit(solveText, solveText.get_rect(center=solveButton.center))
+    
+    def solveDijkstraHover(self):
+        solveButton = pygame.draw.rect(self._mazeScreen, self._hColour, (1210, 150,100, 50), border_radius=15)
+        solveText = self._fontDij.render("Dijkstra", True, (0,0,0))
+        self._mazeScreen.blit(solveText, solveText.get_rect(center=solveButton.center))
+        pygame.display.update()
+
+    def solveAStarButton(self, screen, colour, pos, text:str):
+        pygame.draw.rect(screen, self._black, (885,215,110,60), border_radius=18)
+        solveButton = pygame.draw.rect(screen, colour, pos, border_radius=15)
+        solveText = self._font1.render(text, True, (0,0,0))
+        screen.blit(solveText, solveText.get_rect(center=solveButton.center))
+
+    def solveAStarHover(self):
+        solveButton = pygame.draw.rect(self._mazeScreen, self._hColour, (890, 220,100, 50), border_radius=15)
+        solveText = self._font1.render("A*", True, (0,0,0))
+        self._mazeScreen.blit(solveText, solveText.get_rect(center=solveButton.center))
+        pygame.display.update()
+
     def rdfsGenButton(self, screen, colour, pos, text:str):
-        runButton = pygame.draw.rect(screen, colour, pos)
+        runButton = pygame.draw.rect(screen, colour, pos, border_radius=10)
         runText = self._font.render(text, True, (255,0,0))
         screen.blit(runText, runText.get_rect(center=runButton.center))
 
@@ -596,28 +671,8 @@ class GUI(Ui):
         runButton = pygame.draw.rect(screen, colour, pos)
         runText = self._font.render(text, True, (255,0,0))
         screen.blit(runText, runText.get_rect(center=runButton.center))
-    
-    def solveRDFSButton(self, screen, colour, pos, text:str):
-        solveButton = pygame.draw.rect(screen, colour, pos)
-        solveText = self._font.render(text, True, (255,0,0))
-        screen.blit(solveText, solveText.get_rect(center=solveButton.center))
-
-    def solveAStarButton(self, screen, colour, pos, text:str):
-        solveButton = pygame.draw.rect(screen, colour, pos)
-        solveText = self._font.render(text, True, (255,0,0))
-        screen.blit(solveText, solveText.get_rect(center=solveButton.center))
-
-    def solveBFSButton(self, screen, colour, pos, text:str):
-        solveButton = pygame.draw.rect(screen, colour, pos)
-        solveText = self._font.render(text, True, (255,0,0))
-        screen.blit(solveText, solveText.get_rect(center=solveButton.center))
 
     def solveRHWButton(self, screen, colour, pos, text:str):
-        solveButton = pygame.draw.rect(screen, colour, pos)
-        solveText = self._font.render(text, True, (255,0,0))
-        screen.blit(solveText, solveText.get_rect(center=solveButton.center))
-
-    def solveDijkstraButton(self, screen, colour, pos, text:str):
         solveButton = pygame.draw.rect(screen, colour, pos)
         solveText = self._font.render(text, True, (255,0,0))
         screen.blit(solveText, solveText.get_rect(center=solveButton.center))
@@ -652,10 +707,12 @@ class GUI(Ui):
 
     def drawPauseButton(self):
         if self._isPaused == False:
-            self.pauseButton(self._mazeScreen, pygame.image.load("img\pause.jpg") ,(1075, 780))
+            pygame.draw.rect(self._mazeScreen, self._white, (1075, 780, 50, 50))
+            self.pauseButton(self._mazeScreen, pygame.image.load("img\pause.png") ,(1075, 780))
             pygame.display.update()
         else:
-            self.pauseButton(self._mazeScreen, pygame.image.load(r"img\unpause.jpg") ,(1075, 780))
+            pygame.draw.rect(self._mazeScreen, self._white, (1075, 780, 50, 50))
+            self.pauseButton(self._mazeScreen, pygame.image.load(r"img\unpause.png") ,(1075, 780))
             pygame.display.update()
 
     def settingsButton(self, screen, img, pos):

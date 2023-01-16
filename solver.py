@@ -2,6 +2,7 @@ from generator import *
 from Ui import *
 import random
 from queue import PriorityQueue
+import time
 class Solver:
     def __init__(self, mazeGen:MazeGen):
         self._maze = mazeGen
@@ -67,8 +68,11 @@ class DFS(Solver):
         self._stack = []
         self._tempStack = []
         self._tempStackSearched = []
+        self._startTime = 0
+        self._endTime = 0
 
     def run(self):
+        self._startTime = time.time()
         self.solve(self._startPos[0], self._startPos[1])
 
     def deadEnd(self):
@@ -79,6 +83,7 @@ class DFS(Solver):
     def solve(self, x:int, y:int):
         if self.checkIsEnd(x, y) == "End":
             print("Solved")
+            self._endTime = time.time()
             self.setSolution()
             self._tempStackSearched = self._stackSearched.copy()
             self._stackSearched = []
@@ -119,6 +124,11 @@ class DFS(Solver):
     @property
     def getSearch(self):
         return self._tempStackSearched
+    
+    @property
+    def getTimeTaken(self):
+        return round((self._endTime - self._startTime), 4)
+
 
 ############################################################
 #                                                          #
@@ -142,8 +152,11 @@ class AStar(Solver):
         self._pQueue.put((self.heuristic(self._start, self._end),self.heuristic(self._start, self._end), (self._start)))
         self._gScore[self._start] = 0
         self._fScore[self._start] = self.heuristic(self._start, self._end)
+        self._startTime = 0
+        self._endTime = 0
     
     def run(self):
+        self._startTime = time.time()
         self.algorithm()
 
     def heuristic(self, cell1, cell2) -> int:
@@ -154,6 +167,7 @@ class AStar(Solver):
     def algorithm(self):
         currCell=self._pQueue.get()[2]
         if self.checkIsEnd(currCell[0], currCell[1]) == "End":
+            self._endTime = time.time()
             self._searchPath[self._end] = currCell
             print("Solved")
             self.setSolution()
@@ -184,6 +198,9 @@ class AStar(Solver):
     def getSolution(self):
         return self._searchPath, self._solvePath
 
+    @property
+    def getTimeTaken(self):
+        return round((self._endTime - self._startTime), 4)
 
 class BFS(Solver):
     def __init__(self, mazeGen:MazeGen):
@@ -193,8 +210,11 @@ class BFS(Solver):
         self._front = [self._start]
         self._searched = {}
         self._solvePath = {}
+        self._startTime = 0
+        self._endTime = 0
     
     def run(self):
+        self._startTime = time.time()
         self.solve()
 
     def solve(self):
@@ -203,6 +223,7 @@ class BFS(Solver):
             if self.checkIsEnd(currCell[0], currCell[1]) == "End":
                 self._searched[self._end] = currCell
                 print("Solved")
+                self._endTime = time.time()
                 self.setSolution()
                 return "Solved"
             for childCell in self.checkNeighCells(currCell[0], currCell[1]):
@@ -230,6 +251,10 @@ class BFS(Solver):
     def getSolution(self):
         return self._searched, self._solvePath
 
+    @property
+    def getTimeTaken(self):
+        return round((self._endTime - self._startTime), 4)
+
 class Dijkstra(Solver):
     def __init__(self, mazeGen:MazeGen) -> None:
         super().__init__(mazeGen)
@@ -239,8 +264,11 @@ class Dijkstra(Solver):
         self._revPath = {}
         self._solvedPath = {}
         self._solved = False
+        self._startTime = 0
+        self._endTime = 0
 
     def run(self):
+        self._startTime = time.time()
         self._mazeMap[self._endPos[0], self._endPos[1]]["Type"] = 4
         self.solve()
 
@@ -250,6 +278,7 @@ class Dijkstra(Solver):
     def solve(self):
         currCell = min(self._unVisited, key=self._unVisited.get)
         if self.checkIsEnd(currCell[0], currCell[1]) == "End" and self._solved == False:
+            self._endTime = time.time()
             self._revPath[tuple(self._endPos)] = currCell
             self.setSolution()
         else:
@@ -277,11 +306,14 @@ class Dijkstra(Solver):
             self._mazeMap[cell[0], cell[1]]["Type"] = 2
         self._mazeMap[self._startPos[0], self._startPos[1]]["Type"] = 3
         self._mazeMap[self._endPos[0], self._endPos[1]]["Type"] = 4
-        
 
     @property
     def getSolution(self):
         return self._revPath, self._solvedPath
+
+    @property
+    def getTimeTaken(self):
+        return round((self._endTime - self._startTime), 4)
 
 class RHW(Solver):
     def __init__(self, mazeGen:MazeGen):
