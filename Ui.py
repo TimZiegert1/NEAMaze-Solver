@@ -382,9 +382,10 @@ class GUI(Ui):
                 #if run from here then the game is paused then step works but have to explain that
                 #if run from below then can call paused and then step, this will probably work better
                 #you have to make it so that step can also be called from the very start
+                #Pause button
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     mouse = pygame.mouse.get_pos()
-                    if mouse[0] > 980 and mouse[1] > 170 and mouse[1] < 220 and mouse[0] < 1080:
+                    if mouse[0] > 1075 and mouse[1] > 780 and mouse[1] < 830 and mouse[0] < 1125:
                         self._isPaused = False
                         self.drawPauseButton()
                         #pygame.draw.rect(self._mazeScreen, (50,50,50), ((searchPath[index-1][0]*55)-45,(searchPath[index-1][1]*55)-45,55,55))
@@ -397,25 +398,28 @@ class GUI(Ui):
                         #pygame.draw.rect(self._mazeScreen, (50,50,50), ((searchPath[index-1][0]*55)-45,(searchPath[index-1][1]*55)-45,55,55))
                         pygame.draw.rect(self._mazeScreen, (50,50,50), ((searchPath[index-1][0]*(self._xBox+self._xWall))-(self._xBox-self._xWall),(searchPath[index-1][1]*(self._yBox+self._yWall))-(self._yBox-self._yWall),self._xBox+self._xWall,self._yBox+self._yWall))
                         return index
+                #Quit Button
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     mouse = pygame.mouse.get_pos()
                     if mouse[0] > 1280 and mouse[1] > 790 and mouse[1] < 840 and mouse[0] < 1380:
                         pygame.quit()
                         quit()
+                #Settings Button
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     mouse = pygame.mouse.get_pos()
                     if mouse[0] > 1290 and mouse[1] > 10 and mouse[1] < 85 and mouse[0] < 1365:
                         print("settings")
                         #run settings
                         self.settingsPanel()
+                #Step Button
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     mouse = pygame.mouse.get_pos()
-                    if mouse[0] > 980 and mouse[1] > 120 and mouse[1] < 170 and mouse[0] < 1080:
+                    if mouse[0] > 1150 and mouse[1] > 780 and mouse[1] < 830 and mouse[0] < 1200:
                         if index < len(searchPath):
                             #pygame.draw.rect(self._mazeScreen, (50,50,50), ((searchPath[index-1][0]*55)-45,(searchPath[index-1][1]*55)-45,55,55))
                             #pygame.draw.rect(self._mazeScreen, (255,0,50), ((searchPath[index][0]*55)-45,(searchPath[index][1]*55)-45,55,55))
                             pygame.draw.rect(self._mazeScreen, (50,50,50), ((searchPath[index-1][0]*(self._xBox+self._xWall))-(self._xBox-self._xWall),(searchPath[index-1][1]*(self._yBox+self._yWall))-(self._yBox-self._yWall),self._xBox+self._xWall,self._yBox+self._yWall))
-                            pygame.draw.rect(self._mazeScreen, (255,255,255), ((searchPath[index][0]*(self._xBox+self._xWall))-(self._xBox-self._xWall),(searchPath[index][1]*(self._yBox+self._yWall))-(self._yBox-self._yWall),self._xBox+self._xWall,self._yBox+self._yWall))
+                            pygame.draw.rect(self._mazeScreen, (255,0,50), ((searchPath[index][0]*(self._xBox+self._xWall))-(self._xBox-self._xWall),(searchPath[index][1]*(self._yBox+self._yWall))-(self._yBox-self._yWall),self._xBox+self._xWall,self._yBox+self._yWall))
                             self.drawWalls(self._mazeGen.getMazeMap)
                             pygame.display.update()
                             index += 1
@@ -423,7 +427,7 @@ class GUI(Ui):
                             self._isPaused = False
                             self.drawPauseButton()
                             return index
-                    if mouse[0] > 980 and mouse[1] > 70 and mouse[1] < 120 and mouse[0] < 1080:
+                    if mouse[0] > 1000 and mouse[1] > 780 and mouse[1] < 830 and mouse[0] < 1050:
                         if index > 1:
                             #pygame.draw.rect(self._mazeScreen, (255,255,255), ((searchPath[index-1][0]*55)-45,(searchPath[index-1][1]*55)-45,55,55))
                             #pygame.draw.rect(self._mazeScreen, (255,0,50), ((searchPath[index-2][0]*55)-45,(searchPath[index-2][1]*55)-45,55,55))
@@ -486,7 +490,7 @@ class GUI(Ui):
             for event in pygame.event.get():
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     mouse = pygame.mouse.get_pos()
-                    if mouse[0] > 980 and mouse[1] > 170 and mouse[1] < 220 and mouse[0] < 1080:          
+                    if mouse[0] > 1075 and mouse[1] > 780 and mouse[1] < 830 and mouse[0] < 1125:          
                         index = self.pause(index, searchPath)
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_SPACE:
@@ -494,11 +498,11 @@ class GUI(Ui):
                 #Step Button
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     mouse = pygame.mouse.get_pos()
-                    if mouse[0] > 980 and mouse[1] > 120 and mouse[1] < 170 and mouse[0] < 1080:
+                    if mouse[0] > 1150 and mouse[1] > 780 and mouse[1] < 830 and mouse[0] < 1200:
                         index = self.pause(index, searchPath)
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     mouse = pygame.mouse.get_pos()
-                    if mouse[0] > 980 and mouse[1] > 70 and mouse[1] < 120 and mouse[0] < 1080:
+                    if mouse[0] > 1000 and mouse[1] > 780 and mouse[1] < 830 and mouse[0] < 1050:
                         index = self.pause(index, searchPath)
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_RIGHT:
@@ -518,7 +522,8 @@ class GUI(Ui):
                 self.drawWalls(mazeMap)
                 #time.sleep(searchTime)
                 pygame.time.wait(int(searchTime*100))
-                pygame.display.update()
+                if searchTime != 0:
+                    pygame.display.update()
                 head = 1
                 index += 1
             else:
@@ -530,11 +535,13 @@ class GUI(Ui):
                         self.drawWalls(mazeMap)
                         #time.sleep(solveTime)
                         pygame.time.wait(int(solveTime*100))
-                        pygame.display.update()
+                        if solveTime != 0:
+                            pygame.display.update()
                         index += 1
                     else:
                         break
                 break
+        pygame.display.update()    
 
     #Paste rescale code here to test
 
@@ -550,12 +557,21 @@ class GUI(Ui):
 
 
     def drawButtons(self):
-        pygame.draw.rect(self._mazeScreen, self._black ,(850,100,500,400))
-        pygame.draw.rect(self._mazeScreen, self._white ,(855,105,490,390))
-        self._mazeScreen.blit(self._font2.render("Time Taken", True, (255,0,0)), (850,10))
+        pygame.draw.rect(self._mazeScreen, self._black ,(850,100,500,350))
+        pygame.draw.rect(self._mazeScreen, self._white ,(855,105,490,340))
+
+        self._mazeScreen.blit(self._font2.render("Time Taken", True, (0,0,0)), (850,10))
+        self._mazeScreen.blit(self._font2.render("Searched Cells", True, (0,0,0)), (980,10))
+        self._mazeScreen.blit(self._font2.render("Solved Cells", True, (0,0,0)), (1150,10))
+        self.labels()   
+
+        self.settingsButton(self._mazeScreen, pygame.image.load("img\settingsIcon.png") ,(1290, 10))
+        self.pauseButton(self._mazeScreen, pygame.image.load("img\pause.jpg") ,(1075, 780))
+        self.stepButton(self._mazeScreen, pygame.image.load("img\stepButton.png") ,(1150, 780))
+        self.stepBackButton(self._mazeScreen, pygame.image.load("img\stepBackButton.png") ,(1000, 780))
+
         self.quitButton(self._mazeScreen, self._white ,(1270, 790,100, 50), "Quit")
-        self.settingsButton(self._mazeScreen, pygame.image.load("settingsIcon.png"),(1290, 10))
-        self.clearButton(self._mazeScreen, self._black ,(980, 620,100, 50), "Clear")
+        self.clearButton(self._mazeScreen, self._black ,(980, 620, 100, 50), "Clear")
         self.rdfsGenButton(self._mazeScreen, self._black ,(980, 570,100, 50), "RDFS Gen")
         self.huntAndKillButton(self._mazeScreen, self._black ,(980, 270,100, 50), "Hunt and Kill")
         self.solveRDFSButton(self._mazeScreen, self._black ,(980, 520,100, 50), "Solve")
@@ -564,10 +580,6 @@ class GUI(Ui):
         self.solveRHWButton(self._mazeScreen, self._black ,(980, 370,100, 50), "RHW")
         self.solveDijkstraButton(self._mazeScreen, self._black ,(980, 220,100, 50), "Dijkstra")
         self.clearSolveButton(self._mazeScreen, self._black ,(980, 320,100, 50), "Clear Solve")
-        self.pauseButton(self._mazeScreen, self._black ,(980, 170,100, 50), "Pause")
-        self.stepButton(self._mazeScreen, self._black ,(980, 120,100, 50), "Step")
-        self.stepBackwardButton(self._mazeScreen, self._black ,(980, 70,100, 50), "Step Back")
-        self.labels()
 
 
     def quitButton(self, screen, colour, pos, text:str):
@@ -620,11 +632,6 @@ class GUI(Ui):
         clearText = self._font.render(text, True, (255,0,0))
         screen.blit(clearText, clearText.get_rect(center=clearButton.center))
 
-    def pauseButton(self, screen, colour, pos, text:str):
-        pauseButton = pygame.draw.rect(screen, colour, pos)
-        pauseText = self._font.render(text, True, (255,0,0))
-        screen.blit(pauseText, pauseText.get_rect(center=pauseButton.center))
-
     #Compare button will first bring up tkinter window to select two mazes to compare
     #Compare button can bring up a new window with two 10x10, or if resize is done anysize mazes side by side
     #and a button to compare the two
@@ -633,34 +640,32 @@ class GUI(Ui):
         compareText = self._font.render(text, True, (255,0,0))
         screen.blit(compareText, compareText.get_rect(center=compareButton.center))
 
+    def stepButton(self, screen, img, pos):
+        screen.blit(img, pos)
+
+    def stepBackButton(self, screen, img, pos):
+        screen.blit(img, pos)
+
+
+    def pauseButton(self, screen, img, pos):
+        screen.blit(img, pos)
+
     def drawPauseButton(self):
         if self._isPaused == False:
-            self.pauseButton(self._mazeScreen, self._black ,(980, 170,100, 50), "Pause")
+            self.pauseButton(self._mazeScreen, pygame.image.load("img\pause.jpg") ,(1075, 780))
             pygame.display.update()
         else:
-            self.pauseButton(self._mazeScreen, self._black ,(980, 170,100, 50), "unpause")
+            self.pauseButton(self._mazeScreen, pygame.image.load(r"img\unpause.jpg") ,(1075, 780))
             pygame.display.update()
-
-    #def unPauseButton(self):
-        #pauseButton = pygame.draw.rect(self._mazeScreen, self._white, (900, 170,100, 50))
-        #pauseText = self._font.render("unpause", True, (255,0,0))
-        #self._mazeScreen.blit(pauseText, pauseText.get_rect(center=pauseButton.center))
-
-    def stepButton(self, screen, colour, pos, text:str):
-        stepButton = pygame.draw.rect(screen, colour, pos)
-        stepText = self._font.render(text, True, (255,0,0))
-        screen.blit(stepText, stepText.get_rect(center=stepButton.center))
-
-    def stepBackwardButton(self, screen, colour, pos, text:str):
-        stepButton = pygame.draw.rect(screen, colour, pos)
-        stepText = self._font.render(text, True, (255,0,0))
-        screen.blit(stepText, stepText.get_rect(center=stepButton.center))
 
     def settingsButton(self, screen, img, pos):
         screen.blit(img, pos)
 
-    def labels(self, timeNum=0):
-        self._mazeScreen.blit(self._font.render((f"{timeNum}"), True, (255,0,0)), (850,45))
+    def labels(self, timeNum=0, searchNum=0, solveNum=0):
+        pygame.draw.rect(self._mazeScreen, self._white, (850,45, 425, 40))
+        self._mazeScreen.blit(self._font.render((f"{timeNum}"), True, (0,0,0)), (850,45))
+        self._mazeScreen.blit(self._font.render((f"{searchNum}"), True, (0,0,0)), (980,45))
+        self._mazeScreen.blit(self._font.render((f"{solveNum}"), True, (0,0,0)), (1150,45))
 
     def pickGen(self):
         ... #Drop down of all maze Generation algorithms
