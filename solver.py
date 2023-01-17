@@ -320,51 +320,97 @@ class RHW(Solver):
         super().__init__(mazeGen)
         self._direction = {"up": "N", "left": "W", "down": "S", "right": "E"}
         self._stack = []
+        self._start = tuple(self._maze.getStartPos)
+        self._path = ""
+        self._solvedPath = []
 
     def run(self):
-        self.solve(self._startPos[0], self._startPos[1])
+
+        #THIS ONLY WORKS IF THE MAZE IS BLOCKED IN ALL DIRECTIONS, CHANGE IT SO IT DOESNT HAVE TO BE
+
+        #if self._start[0] == 1:
+            #self._mazeMap[1,self._maze.getHeight]["W"] = 1
+        #if self._start[0] == self._maze.getWidth:
+            #self._mazeMap[self._maze.getWidth,self._maze.getHeight]["E"] = 1
+        #if self._start[1] == 1:
+            #self._mazeMap[self._maze.getWidth,1]["N"] = 1
+        #if self._start[1] == self._maze.getHeight:
+            #self._mazeMap[self._maze.getWidth,self._maze.getHeight]["S"] = 1
+        self.solve()
 
     def rotateCW(self):
         values = list(self._direction.values())
-        self._direction = dict(zip(self._direction.keys(), [values[-1]]+values[:-1]))
+        tempDict = dict(zip(self._direction.keys(), [values[-1]]+values[:-1]))
+        self._direction = tempDict
 
     def rotateCCW(self):
         values = list(self._direction.values())
-        self._direction = dict(zip(self._direction.keys(), values[1:]+[values[0]]))
+        tempDict = dict(zip(self._direction.keys(), values[1:]+[values[0]]))
+        self._direction = tempDict
 
     def moveForward(self, x:int, y:int):
+    #if y-1 > 0:
         if self._direction["up"] == "N":
-            return (x, y+1)
-        elif self._direction["up"] == "E":
-            return (x+1, y)
-        elif self._direction["up"] == "S":
-            return (x, y-1)
-        elif self._direction["up"] == "W":
-            return (x-1, y)
+            return (x, y-1),"N"
+    #if x+1 < self._maze.getWidth:
+        if self._direction["up"] == "E":
+            return (x+1, y),"E"
+    #if y+1 < self._maze.getHeight:
+        if self._direction["up"] == "S":
+            return (x, y+1),"S"
+    #if x-1 >= 0:
+        if self._direction["up"] == "W":
+            return (x-1, y),"W"
+            
 
     def deadEnd(self):
         self._stack.pop()
         self.solve(self._stack[-1][0], self._stack[-1][1])
     
-    def solve(self,x:int, y:int):
-        self._stack.append((x, y))
-        print(self._stack)
-        if self.checkIsEnd(x, y) == "End":
-            print("Solved")
-            self.setSolution()
-            return "Solved"
-        if self._mazeMap[x, y]["E"] == 1:
-            if self._mazeMap[x, y]["N"] == 1:
-                self.rotateCW()
+    def solve(self):
+        currCell = self.findNextMove(self._maze.getStartPos[0], self._maze.getStartPos[1])
+        while True:
+            self._stack.append(currCell)
+            if self.checkIsEnd(currCell[0], currCell[1]) == "End":
+                print("Solved")
+                self.setSolution()
+                return "Solved"
+            if self._mazeMap[currCell][self._direction["right"]] == 1:
+                if self._mazeMap[currCell][self._direction["up"]] == 1:
+                    self.rotateCCW()
+                else:
+                    currCell,d=self.moveForward(currCell[0], currCell[1])
+                    self._path += d
             else:
-                self.solve(self.moveForward(x, y)[0], self.moveForward(x, y)[1])
-        else:
-            self.rotateCCW()
-            self.solve(self.moveForward(x, y)[0], self.moveForward(x, y)[1])
+                self.rotateCW()
+                currCell,d=self.moveForward(currCell[0], currCell[1])
+                self._path += d
 
 
     def setSolution(self):
+        currCell = self._stack[0]
+        while "EW" in self._path or "WE" in self._path or "NS" in self._path or "SN" in self._path:
+            self._path = self._path.replace("EW", "")
+            self._path = self._path.replace("WE", "")
+            self._path = self._path.replace("NS", "")
+            self._path = self._path.replace("SN", "")
+        print(self._path)
+        for d in self._path:
+            if d == "N":
+                currCell = (currCell[0], currCell[1]-1)
+                self._solvedPath.append(currCell)
+            if d == "E":
+                currCell = (currCell[0]+1, currCell[1])
+                self._solvedPath.append(currCell)
+            if d == "S":
+                currCell = (currCell[0], currCell[1]+1)
+                self._solvedPath.append(currCell)
+            if d == "W":
+                currCell = (currCell[0]-1, currCell[1])
+                self._solvedPath.append(currCell)
         for cell in self._stack:
             self._mazeMap[cell[0], cell[1]]["Type"] = 5
+        for cell in self._solvedPath:
+            self._mazeMap[cell[0], cell[1]]["Type"] = 2
         self._mazeMap[self._startPos[0], self._startPos[1]]["Type"] = 3
         self._mazeMap[self._endPos[0], self._endPos[1]]["Type"] = 4
