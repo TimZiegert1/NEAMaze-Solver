@@ -233,14 +233,6 @@ class GUI(Ui):
                         self.labels(self._AStar.getTimeTaken, len(AStarSearch), len(AStarSolve))
                         #self.drawMaze(self._mazeGen.getMazeMap)
                         self.drawMazeSolve(self._mazeGen.getMazeMap, AStarSearch, AStarSolve, self._searchTime, self._solveTime)
-                #Solve RHW Button
-                if event.type == pygame.MOUSEBUTTONDOWN:
-                    mouse = pygame.mouse.get_pos()
-                    if mouse[0] > 980 and mouse[1] > 370 and mouse[1] < 420 and mouse[0] < 1080:
-                        self._isGeneration = False
-                        self._RHW = RHW(self._mazeGen)
-                        self._RHW.run()
-                        self.drawMaze(self._mazeGen.getMazeMap)
                 #Dijkstra Button
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     mouse = pygame.mouse.get_pos()  
@@ -253,6 +245,28 @@ class GUI(Ui):
                         self.labels(self._Dijkstra.getTimeTaken, len(DijkstraSearch), len(DijkstraSolve))
                         #self.drawMaze(self._mazeGen.getMazeMap)
                         self.drawMazeSolve(self._mazeGen.getMazeMap, DijkstraSearch, DijkstraSolve, self._searchTime, self._solveTime)
+                #Solve RHW Button
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    mouse = pygame.mouse.get_pos()
+                    if mouse[0] > 1045 and mouse[1] > 215 and mouse[1] < 275 and mouse[0] < 1155:
+                        self._isGeneration = False
+                        self._RHW = RHW(self._mazeGen)
+                        self._RHW.run()
+                        RHWSearch = self._RHW.getSolution[0]
+                        RHWSolve = self._RHW.getSolution[1]
+                        self.labels(self._RHW.getTimeTaken, len(RHWSearch), len(RHWSolve))
+                        self.drawMazeSolve(self._mazeGen.getMazeMap, RHWSearch, RHWSolve, self._searchTime, self._solveTime)
+                #Solve LHW Button
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    mouse = pygame.mouse.get_pos()
+                    if mouse[0] > 1205 and mouse[1] > 215 and mouse[1] < 275 and mouse[0] < 1315:
+                        self._isGeneration = False
+                        self._LHW = LHW(self._mazeGen)
+                        self._LHW.run()
+                        LHWSearch = self._LHW.getSolution[0]
+                        LHWSolve = self._LHW.getSolution[1]
+                        self.labels(self._LHW.getTimeTaken, len(LHWSearch), len(LHWSolve))
+                        self.drawMazeSolve(self._mazeGen.getMazeMap, LHWSearch, LHWSolve, self._searchTime, self._solveTime)
                 #Generate new maze button
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     mouse = pygame.mouse.get_pos()
@@ -288,6 +302,16 @@ class GUI(Ui):
                         self.solveAStarHover()
                     else:
                         self.solveAStarButton(self._mazeScreen, self._bColour ,(890, 220,100, 50), "A*")
+                        pygame.display.update()
+                    if mouse[0] > 1045 and mouse[1] > 215 and mouse[1] < 275 and mouse[0] < 1155:
+                        self.solveRHWHover()
+                    else:
+                        self.solveRHWButton(self._mazeScreen, self._bColour ,(1050, 220,100, 50), "RHW")
+                        pygame.display.update()
+                    if mouse[0] > 1205 and mouse[1] > 215 and mouse[1] < 275 and mouse[0] < 1315:
+                        self.solveLHWHover()
+                    else:
+                        self.solveLHWButton(self._mazeScreen, self._bColour ,(1210, 220,100, 50), "LHW")
                         pygame.display.update()
 
                 
@@ -604,7 +628,8 @@ class GUI(Ui):
         self.solveBFSButton(self._mazeScreen, self._bColour ,(1050, 150,100, 50), "BFS")
         self.solveDijkstraButton(self._mazeScreen, self._bColour ,(1210, 150,100, 50), "Dijkstra")
         self.solveAStarButton(self._mazeScreen, self._bColour ,(890, 220,100, 50), "A*")
-        self.solveRHWButton(self._mazeScreen, self._black ,(980, 370,100, 50), "RHW")
+        self.solveRHWButton(self._mazeScreen, self._bColour ,(1050, 220,100, 50), "RHW")
+        self.solveLHWButton(self._mazeScreen, self._bColour ,(1210, 220,100, 50), "LHW")
         self.clearSolveButton(self._mazeScreen, self._black ,(980, 320,100, 50), "Clear Solve")
 
 
@@ -662,6 +687,30 @@ class GUI(Ui):
         self._mazeScreen.blit(solveText, solveText.get_rect(center=solveButton.center))
         pygame.display.update()
 
+    def solveRHWButton(self, screen, colour, pos, text:str):
+        pygame.draw.rect(screen, self._black, (1045,215,110,60), border_radius=18)
+        solveButton = pygame.draw.rect(screen, colour, pos, border_radius=15)
+        solveText = self._font1.render(text, True, (0,0,0))
+        screen.blit(solveText, solveText.get_rect(center=solveButton.center))
+
+    def solveRHWHover(self):
+        solveButton = pygame.draw.rect(self._mazeScreen, self._hColour, (1050, 220,100, 50), border_radius=15)
+        solveText = self._font1.render("RHW", True, (0,0,0))
+        self._mazeScreen.blit(solveText, solveText.get_rect(center=solveButton.center))
+        pygame.display.update()
+
+    def solveLHWButton(self, screen, colour, pos, text:str):
+        pygame.draw.rect(screen, self._black, (1205,215,110,60), border_radius=18)
+        solveButton = pygame.draw.rect(screen, colour, pos, border_radius=15)
+        solveText = self._font1.render(text, True, (0,0,0))
+        screen.blit(solveText, solveText.get_rect(center=solveButton.center))
+    
+    def solveLHWHover(self):
+        solveButton = pygame.draw.rect(self._mazeScreen, self._hColour, (1210, 220,100, 50), border_radius=15)
+        solveText = self._font1.render("LHW", True, (0,0,0))
+        self._mazeScreen.blit(solveText, solveText.get_rect(center=solveButton.center))
+        pygame.display.update()
+
     def rdfsGenButton(self, screen, colour, pos, text:str):
         runButton = pygame.draw.rect(screen, colour, pos, border_radius=10)
         runText = self._font.render(text, True, (255,0,0))
@@ -671,11 +720,6 @@ class GUI(Ui):
         runButton = pygame.draw.rect(screen, colour, pos)
         runText = self._font.render(text, True, (255,0,0))
         screen.blit(runText, runText.get_rect(center=runButton.center))
-
-    def solveRHWButton(self, screen, colour, pos, text:str):
-        solveButton = pygame.draw.rect(screen, colour, pos)
-        solveText = self._font.render(text, True, (255,0,0))
-        screen.blit(solveText, solveText.get_rect(center=solveButton.center))
 
     def clearButton(self, screen, colour, pos, text:str):
         clearButton = pygame.draw.rect(screen, colour, pos)
