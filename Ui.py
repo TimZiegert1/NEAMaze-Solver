@@ -1,6 +1,8 @@
 from generator import *
 from solver import *
 from mazeGen import *
+from database import *
+
 import tkinter as tk
 from tkinter import messagebox as tkMessageBox
 import pygame
@@ -90,7 +92,7 @@ class GUI(Ui):
             usernameLabel = tk.Label(loginScreen, text="Username")
             passwordLabel = tk.Label(loginScreen, text="Password")
             usernameEntry = tk.Entry(loginScreen)
-            passwordEntry = tk.Entry(loginScreen)
+            passwordEntry = tk.Entry(loginScreen, show="*")
             loginButton = tk.Button(loginScreen, text="Login", command=lambda: [self.login(usernameEntry.get(), passwordEntry.get()), loginScreen.destroy()])
             registerButton = tk.Button(loginScreen, text="Register", command=lambda: [loginScreen.destroy(), self.registerPanel()])
             closeButton = tk.Button(loginScreen, text="Close", command=lambda: [loginScreen.destroy(), self._main.deiconify()])
@@ -109,10 +111,11 @@ class GUI(Ui):
         usernameLabel = tk.Label(registerScreen, text="Username")
         passwordLabel = tk.Label(registerScreen, text="Password")
         passwordLabel2 = tk.Label(registerScreen, text="Confirm Password")
+        #showPassword = tk.Button(registerScreen, text="Show", command=lambda: [passwordEntry.config(show=""), passwordEntry2.config(show="")])
         close = tk.Button(registerScreen, text="Close", command=lambda: [registerScreen.destroy(), self._main.deiconify()])
         usernameEntry = tk.Entry(registerScreen)
-        passwordEntry = tk.Entry(registerScreen)
-        passwordEntry2 = tk.Entry(registerScreen)
+        passwordEntry = tk.Entry(registerScreen, show="*")
+        passwordEntry2 = tk.Entry(registerScreen, show="*")
         registerButton = tk.Button(registerScreen, text="Register", command=lambda: [self.checkPasswordMatch(usernameEntry.get(), passwordEntry.get(), passwordEntry2.get())])
         usernameLabel.grid(row=0, column=0)
         passwordLabel.grid(row=1, column=0)
@@ -121,6 +124,7 @@ class GUI(Ui):
         passwordEntry.grid(row=1, column=1)
         passwordEntry2.grid(row=2, column=1)
         registerButton.grid(row=3, column=0)
+        #showPassword.grid(row=3, column=2)
         close.grid(row=3, column=1)
         registerScreen.mainloop()
 
