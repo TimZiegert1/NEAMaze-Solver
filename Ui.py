@@ -674,6 +674,8 @@ class GUI(Ui):
         self.huntAndKillButton(self._mazeScreen, self._bColour ,(1050, 510,100, 50), "Hunt&Kill")
         self.binaryTreeButton(self._mazeScreen, self._bColour ,(1210, 510,100, 50), "BST")
 
+        self.compareButton(self._mazeScreen, self._bColour ,(890, 680,100, 50), "Compare")
+
 
     def quitButton(self, screen, colour, pos, text:str):
         quitButton = pygame.draw.rect(screen, colour, pos)
@@ -813,20 +815,11 @@ class GUI(Ui):
         self._mazeScreen.blit(clearText, clearText.get_rect(center=clearButton.center))
         pygame.display.update()
 
-    #Compare button will first bring up tkinter window to select two mazes to compare
-    #Compare button can bring up a new window with two 10x10, or if resize is done anysize mazes side by side
-    #and a button to compare the two
-    def compareButton(self, screen, colour, pos, text:str):
-        compareButton = pygame.draw.rect(screen, colour, pos)
-        compareText = self._font.render(text, True, (255,0,0))
-        screen.blit(compareText, compareText.get_rect(center=compareButton.center))
-
     def stepButton(self, screen, img, pos):
         screen.blit(img, pos)
 
     def stepBackButton(self, screen, img, pos):
         screen.blit(img, pos)
-
 
     def pauseButton(self, screen, img, pos):
         screen.blit(img, pos)
@@ -853,23 +846,22 @@ class GUI(Ui):
     def solveText(self, text):
         self._mazeScreen.blit(self._font1.render((f"{text}"), True, (0,0,0)), (890,310))
 
+    #Compare button will first bring up tkinter window to select two mazes to compare
+    #Compare button can bring up a new window with two 10x10, or if resize is done anysize mazes side by side
+    #and a button to compare the two
+    def compareButton(self, screen, colour, pos, text:str):
+        compareButton = pygame.draw.rect(screen, colour, pos, border_radius=15)
+        compareText = self._font.render(text, True, (0,0,0))
+        screen.blit(compareText, compareText.get_rect(center=compareButton.center))
+
     def pickGen(self):
         ... #Drop down of all maze Generation algorithms
 
     def pickSolve(self):
         ... #Drop down of all maze solving algorithms
 
-    def editMaze(self):
-        ...
-
     def customise(self):
         ... #Customise, colours, etc
-
-    def userChangeStart(self):
-        ...
-
-    def userChangeEnd(self):
-        ...
 
     def login(self):
         ...
