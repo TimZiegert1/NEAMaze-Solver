@@ -92,12 +92,14 @@ class GUI(Ui):
         speedSolve = tk.Label(self._settings, text="Speed of Solve")
         startPos = tk.Label(self._settings, text="Start Position")
         endPos = tk.Label(self._settings, text="End Position")
+        BTdropDownLabel = tk.Label(self._settings, text="Binary Tree Direction")
         widthLabel.grid(row=0, column=0)
         heightLabel.grid(row=1, column=0)
         speedSearch.grid(row=2, column=0)
         speedSolve.grid(row=3, column=0)
         startPos.grid(row=4, column=0)
         endPos.grid(row=5, column=0) 
+        BTdropDownLabel.grid(row=6, column=0)
         wBox = tk.Entry(self._settings, width=5)
         hBox = tk.Entry(self._settings, width=5)
         speedSliderSearch = tk.Scale(self._settings, from_=0.0, to=1.0, resolution=0.01 ,orient=tk.HORIZONTAL)
@@ -106,6 +108,9 @@ class GUI(Ui):
         speedSliderSolve.set(self._solveTime)
         startPosbox = tk.Entry(self._settings, width=5)
         endPosbox = tk.Entry(self._settings, width=5)
+        BTDropDownclick = tk.StringVar()
+        BTDropDownclick.set("NW")
+        BTdropDown = tk.OptionMenu(self._settings, BTDropDownclick, "NW", "NE", "SW", "SE")
         #self._wSlider.grid(row=0, column=1)
         #self._hSlider.grid(row=1, column=1)
         wBox.grid(row=0, column=1)
@@ -114,11 +119,12 @@ class GUI(Ui):
         speedSliderSolve.grid(row=3, column=1)
         startPosbox.grid(row=4, column=1)
         endPosbox.grid(row=5, column=1)
-        applyButton = tk.Button(self._settings, text="Apply", command=lambda: [self.applyButton(hBox, wBox, speedSliderSearch, speedSliderSolve, startPosbox, endPosbox), self._settings.destroy(), self.mazePanel()])
-        applyButton.grid(row=6, column=0)
+        BTdropDown.grid(row=6, column=1)
+        applyButton = tk.Button(self._settings, text="Apply", command=lambda: [self.applyButton(hBox, wBox, speedSliderSearch, speedSliderSolve, startPosbox, endPosbox, BTDropDownclick), self._settings.destroy(), self.mazePanel()])
+        applyButton.grid(row=7, column=0)
         self._settings.mainloop()
 
-    def applyButton(self, hBox, wBox, speedSliderSearch, speedSliderSolve, startPosbox, endPosbox):
+    def applyButton(self, hBox, wBox, speedSliderSearch, speedSliderSolve, startPosbox, endPosbox, BTDropDownClick):
         if hBox.get() == "" or wBox.get() == "" or hBox.get().isdigit() == False or wBox.get().isdigit() == False or int(hBox.get()) < 4 or int(wBox.get()) < 4 or int(hBox.get()) > 200 or int(wBox.get()) > 200:
             pass
         else:
@@ -135,11 +141,13 @@ class GUI(Ui):
         self._solveTime = speedSliderSolve.get()
         self._mazeGen = MazeGen(self._height, self._width)
         #self._mazeGen.genMaze()
+        self._BTdirection = BTDropDownClick.get()
         self._xBox = self.getRescaleValue(self._width, self._height)[0]
         self._yBox = self.getRescaleValue(self._width, self._height)[1]
         self._xWall = self.getRescaleValue(self._width, self._height)[2]
         self._yWall = self.getRescaleValue(self._width, self._height)[3]
         self.drawMaze(self._mazeGen.getMazeMap)
+        self._isGeneration = False
         self._settings.destroy()
         #self._settings.withdraw()
         self.mazePanel()
@@ -250,7 +258,7 @@ class GUI(Ui):
                     if mouse[0] > 1205 and mouse[1] > 375 and mouse[1] < 435 and mouse[0] < 1315 and self._isGeneration == True:
                         self._mazeGen.setMazeMap(copy.deepcopy(self._mazeGen.getTempMaze))
                         self.drawMaze(self._mazeGen.getTempMaze)
-                        self._isGeneration = False
+                        self._isGeneration = True
                 #RDFS GEN button
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     mouse = pygame.mouse.get_pos()
