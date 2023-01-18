@@ -217,7 +217,6 @@ class GUI(Ui):
 
     def mazePanel(self):
         self._mazeScreen = pygame.display.set_mode((1375,850), flags=pygame.SHOWN)
-        print(self._mazeScreen)
         self._mazeScreen.fill((255,255,255))
         self.drawMaze(self._mazeGen.getMazeMap)
         self.drawButtons()
@@ -350,7 +349,7 @@ class GUI(Ui):
                 #Generate new maze button
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     mouse = pygame.mouse.get_pos()
-                    if mouse[0] > 1210 and mouse[1] > 680 and mouse[1] < 730 and mouse[0] < 1310:
+                    if mouse[0] > 1210 and mouse[1] > 575 and mouse[1] < 635 and mouse[0] < 1310:
                         self._mazeGen.setMazeMap = {}
                         self._mazeGen = MazeGen(self._height, self._width)
                         self.drawMaze(self._mazeGen.getMazeMap)
@@ -408,10 +407,20 @@ class GUI(Ui):
                     else:
                         self.binaryTreeButton(self._mazeScreen, self._bColour ,(1210, 510,100, 50), "BST")
                         pygame.display.update()
-                    if mouse[0] > 1210 and mouse[1] > 680 and mouse[1] < 730 and mouse[0] < 1310:
+                    if mouse[0] > 1210 and mouse[1] > 575 and mouse[1] < 635 and mouse[0] < 1310:
                         self.clearHover()
                     else:
-                        self.clearButton(self._mazeScreen, self._bColour ,(1210, 680,100, 50), "Clear")
+                        self.clearButton(self._mazeScreen, self._bColour ,(1210, 580,100, 50), "Clear")
+                        pygame.display.update()
+                    if mouse[0] > 885 and mouse[1] > 695 and mouse[1] < 805 and mouse[0] < 995:
+                        self.saveHover()
+                    else:
+                        self.saveButton(self._mazeScreen, self._bColour ,(890, 700,100, 50), "Save")
+                        pygame.display.update()
+                    if mouse[0] > 1045 and mouse[1] > 695 and mouse[1] < 805 and mouse[0] < 1155:
+                        self.loadHover()
+                    else:
+                        self.loadButton(self._mazeScreen, self._bColour ,(1050, 700,100, 50), "Load")
                         pygame.display.update()
                 
         pygame.quit()
@@ -704,8 +713,8 @@ class GUI(Ui):
         pygame.draw.rect(self._mazeScreen, self._white ,(855,105,490,340))
         self._mazeScreen.blit(self._font.render("Solve", True, (0,0,0)), (1050,110))
         #Gen Border
-        pygame.draw.rect(self._mazeScreen, self._black ,(850,455,500,300))
-        pygame.draw.rect(self._mazeScreen, self._white ,(855,460,490,290))
+        pygame.draw.rect(self._mazeScreen, self._black ,(850,455,500,200))
+        pygame.draw.rect(self._mazeScreen, self._white ,(855,460,490,190))
         self._mazeScreen.blit(self._font.render("Generate", True, (0,0,0)), (1025,465))
 
         self._mazeScreen.blit(self._font2.render("Time Taken", True, (0,0,0)), (850,10))
@@ -727,10 +736,13 @@ class GUI(Ui):
         self.solveLHWButton(self._mazeScreen, self._bColour ,(1210, 220,100, 50), "LHW")
         self.clearSolveButton(self._mazeScreen, self._bColour ,(1210, 380,100, 50), "Clear")  
                 
-        self.clearButton(self._mazeScreen, self._bColour ,(1210, 680, 100, 50), "Clear")
         self.rdfsGenButton(self._mazeScreen, self._bColour ,(890, 510,100, 50), "RBT")
         self.huntAndKillButton(self._mazeScreen, self._bColour ,(1050, 510,100, 50), "Hunt&Kill")
         self.binaryTreeButton(self._mazeScreen, self._bColour ,(1210, 510,100, 50), "BST")
+        self.clearButton(self._mazeScreen, self._bColour ,(1210, 580, 100, 50), "Clear")
+
+        self.saveButton(self._mazeScreen, self._bColour ,(890, 700, 100, 50), "Save")
+        self.loadButton(self._mazeScreen, self._bColour ,(1050, 700, 100, 50), "Load")
 
     def quitButton(self, screen, colour, pos, text:str):
         quitButton = pygame.draw.rect(screen, colour, pos)
@@ -849,23 +861,23 @@ class GUI(Ui):
     def binaryTreeButton(self, screen, colour, pos, text:str):
         pygame.draw.rect(screen, self._black, (1205,505,110,60), border_radius=18)
         runButton = pygame.draw.rect(screen, colour, pos, border_radius=15)
-        runText = self._font2.render(text, True, (0,0,0))
+        runText = self._font1.render(text, True, (0,0,0))
         screen.blit(runText, runText.get_rect(center=runButton.center))
 
     def binaryTreeHover(self):
         runButton = pygame.draw.rect(self._mazeScreen, self._hColour, (1210, 510,100, 50), border_radius=15)
-        runText = self._font2.render("BST", True, (0,0,0))
+        runText = self._font1.render("BST", True, (0,0,0))
         self._mazeScreen.blit(runText, runText.get_rect(center=runButton.center))
         pygame.display.update()
 
     def clearButton(self, screen, colour, pos, text:str):
-        pygame.draw.rect(screen, self._black, (1205,675,110,60), border_radius=18)
+        pygame.draw.rect(screen, self._black, (1205,575,110,60), border_radius=18)
         clearButton = pygame.draw.rect(screen, colour, pos, border_radius=15)
         clearText = self._font.render(text, True, (0,0,0))
         screen.blit(clearText, clearText.get_rect(center=clearButton.center))
 
     def clearHover(self):
-        clearButton = pygame.draw.rect(self._mazeScreen, self._hColour, (1210, 680, 100, 50), border_radius=15)
+        clearButton = pygame.draw.rect(self._mazeScreen, self._hColour, (1210, 580, 100, 50), border_radius=15)
         clearText = self._font.render("Clear", True, (0,0,0))
         self._mazeScreen.blit(clearText, clearText.get_rect(center=clearButton.center))
         pygame.display.update()
@@ -901,11 +913,29 @@ class GUI(Ui):
     def solveText(self, text):
         self._mazeScreen.blit(self._font1.render((f"{text}"), True, (0,0,0)), (890,310))
 
-    def pickGen(self):
-        ... #Drop down of all maze Generation algorithms
+    def saveButton(self, screen, colour, pos, text:str):
+        pygame.draw.rect(screen, self._black, (885,695,110,60), border_radius=18)
+        saveButton = pygame.draw.rect(screen, colour, pos, border_radius=15)
+        saveText = self._font.render(text, True, (0,0,0))
+        screen.blit(saveText, saveText.get_rect(center=saveButton.center))
 
-    def pickSolve(self):
-        ... #Drop down of all maze solving algorithms
+    def saveHover(self):
+        saveButton = pygame.draw.rect(self._mazeScreen, self._hColour, (890, 700, 100, 50), border_radius=15)
+        saveText = self._font.render("Save", True, (0,0,0))
+        self._mazeScreen.blit(saveText, saveText.get_rect(center=saveButton.center))
+        pygame.display.update()
+
+    def loadButton(self, screen, colour, pos, text:str):
+        pygame.draw.rect(screen, self._black, (1045,695,110,60), border_radius=18)
+        loadButton = pygame.draw.rect(screen, colour, pos, border_radius=15)
+        loadText = self._font.render(text, True, (0,0,0))
+        screen.blit(loadText, loadText.get_rect(center=loadButton.center))
+
+    def loadHover(self):
+        loadButton = pygame.draw.rect(self._mazeScreen, self._hColour, (1050, 700, 100, 50), border_radius=15)
+        loadText = self._font.render("Load", True, (0,0,0))
+        self._mazeScreen.blit(loadText, loadText.get_rect(center=loadButton.center))
+        pygame.display.update()
 
     def customise(self):
         ... #Customise, colours, etc

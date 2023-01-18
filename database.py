@@ -45,6 +45,8 @@ def registerDataBase(username:str, password:str):
         #print("This username is already in use")
         return "Taken"
 
+
+
 #register("admin2", "admin")
 
 # Insert a row of data
