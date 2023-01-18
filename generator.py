@@ -183,7 +183,6 @@ class RDFS(Generator):
     def getGen(self):
         return self._stackGen
 
-#NOT 100% WORKING CHECK ON IT
 class HuntAndKill(Generator):
     def __init__(self, mazeGen):
         super().__init__(mazeGen)
@@ -225,10 +224,16 @@ class HuntAndKill(Generator):
         if len(neighCells) == 0: return "Dead End"
         return random.choice(neighCells)    
 
+    def checkSolved(self):
+        for cell in self._mazeMap:
+            if self._mazeMap[cell]["Type"] == 0:
+                return False
+        return True
+
     def checkLineSolved(self):
         count = 0
         for x in range(self._maze.getWidth):
-            if self.findHunt(x+1, self._lastSolvedLine) == "Dead End":
+            if self.findHunt(x+1, self._lastSolvedLine) == "Dead End" and self._mazeMap[x+1, self._lastSolvedLine]["Type"] == 1:
                 count += 1
             if count == self._maze.getWidth:
                 self._lastSolvedLine += 1
@@ -253,7 +258,6 @@ class HuntAndKill(Generator):
                             self.delEast(x,y)
                         elif delWall == "N":
                             self.delNorth(x,y)
-                        #print(f"X:{x+1} Y:{self._lastSolvedLine}")
                         self.algorithm(x, y)
                     x+=1
             else:
@@ -261,11 +265,9 @@ class HuntAndKill(Generator):
 
 
     def algorithm(self, x, y):
-        print(f"LAST LINE SOLVED: {self._lastSolvedLine}")
-        #print(self._stack)
-        #print(self._lastSolvedLine)
         self._stack.append(self.findNextMove(x,y))
-        if self._lastSolvedLine == self._maze.getHeight:
+        if self.checkSolved() == True:
+            print(self._lastSolvedLine)
             self._stack.pop()
             self.changeCellType(self._maze.getStartPos[0], self._maze.getStartPos[1], 3)
             self.changeCellType(self._maze.getEndPos[0], self._maze.getEndPos[1], 4)
@@ -287,34 +289,79 @@ class HuntAndKill(Generator):
         try:
             self.changeCellType(self._stack[-1][1],self._stack[-1][2],1)
         except:
-            #print("Dont hit run twice")
             pass
         try:
-            print(self._stack[-1][1], self._stack[-1][2])
             self.algorithm(self._stack[-1][1], self._stack[-1][2]) 
         except:
             pass      
-        '''
-        except IndexError:
-            self.changeCellType(self._maze.getStartPos[0], self._maze.getStartPos[1], 3)
-            self.changeCellType(self._maze.getEndPos[0], self._maze.getEndPos[1], 4)
-            tempMaze = copy.deepcopy(self._mazeMap)
-            self._maze.setTempMaze(tempMaze)
-            print("Generated Maze")
-        '''
 
-class BFS(Generator):
-    def __init__(self):
-        super().__init__()
-        self._stack = [MazeGen.getStartPos]
-        self._visited = []
+class BinaryTree(Generator):
+    def __init__(self, mazeGen: MazeGen):
+        super().__init__(mazeGen)
 
-    def run(self):
-        self.getStack()
+    def run(self, direction:str):
+        self.changeCellType(self._maze.getStartPos[0], self._maze.getStartPos[1], 0)
+        self.changeCellType(self._maze.getEndPos[0], self._maze.getEndPos[1], 0)
+        self.algorithm(direction)
 
-    def nextCell(self):
-        ...
-
-    @property
-    def getStack(self):
-        return self._stack
+    def algorithm(self, direction):
+        for cell in self._mazeMap:
+            if direction == "NW":
+                self._mazeMap[cell]["Type"] = 1
+                randNum = random.randint(0,1)
+                if cell[1] == 1 and cell[0] != 1:
+                    self.delWest(cell[0], cell[1])              
+                if cell[0] == 1 and cell[1] != 1:
+                    self.delNorth(cell[0], cell[1])
+                if cell[1] != 1:
+                    if randNum == 0:
+                        self.delNorth(cell[0], cell[1])
+                if cell[0] != 1:
+                    if randNum == 1:
+                        self.delWest(cell[0], cell[1])
+            elif direction == "NE":
+                self._mazeMap[cell]["Type"] = 1
+                randNum = random.randint(0,1)
+                if cell[1] == 1 and cell[0] != self._maze.getWidth:
+                    self.delEast(cell[0], cell[1])              
+                if cell[0] == self._maze.getWidth and cell[1] != 1:
+                    self.delNorth(cell[0], cell[1])
+                if cell[1] != 1:
+                    if randNum == 0:
+                        self.delNorth(cell[0], cell[1])
+                if cell[0] != self._maze.getWidth:
+                    if randNum == 1:
+                        self.delEast(cell[0], cell[1])
+            elif direction == "SW":
+                self._mazeMap[cell]["Type"] = 1
+                randNum = random.randint(0,1)
+                if cell[1] == self._maze.getHeight and cell[0] != 1:
+                    self.delWest(cell[0], cell[1])              
+                if cell[0] == 1 and cell[1] != self._maze.getHeight:
+                    self.delSouth(cell[0], cell[1])
+                if cell[1] != self._maze.getHeight:
+                    if randNum == 0:
+                        self.delSouth(cell[0], cell[1])
+                if cell[0] != 1:
+                    if randNum == 1:
+                        self.delWest(cell[0], cell[1])
+            elif direction == "SE":
+                self._mazeMap[cell]["Type"] = 1
+                randNum = random.randint(0,1)
+                if cell[1] == self._maze.getHeight and cell[0] != self._maze.getWidth:
+                    self.delEast(cell[0], cell[1])              
+                if cell[0] == self._maze.getWidth and cell[1] != self._maze.getHeight:
+                    self.delSouth(cell[0], cell[1])
+                if cell[1] != self._maze.getHeight:
+                    if randNum == 0:
+                        self.delSouth(cell[0], cell[1])
+                if cell[0] != self._maze.getWidth:
+                    if randNum == 1:
+                        self.delEast(cell[0], cell[1])
+            if cell == (self._maze.getWidth, self._maze.getHeight):
+                self.changeCellType(self._maze.getStartPos[0], self._maze.getStartPos[1], 3)
+                self.changeCellType(self._maze.getEndPos[0], self._maze.getEndPos[1], 4)
+                tempMaze = copy.deepcopy(self._mazeMap)
+                self._maze.setTempMaze(tempMaze)
+                print("Generated Maze")
+                return

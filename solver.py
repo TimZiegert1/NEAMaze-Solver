@@ -328,12 +328,7 @@ class RHW(Solver):
         self._endTime = 0
 
     def run(self):
-
         self._startTime = time.time()
-        #THIS ONLY WORKS IF THE MAZE IS BLOCKED IN ALL DIRECTIONS, CHANGE IT SO IT DOESNT HAVE TO BE
-
-        print(self._start)
-
         if self._start[0] == 1:
             self._mazeMap[self._maze.getStartPos[0], self._maze.getStartPos[1]]["W"] = 1
         if self._start[0] == self._maze.getWidth:
@@ -444,12 +439,7 @@ class LHW(Solver):
         self._endTime = 0
 
     def run(self):
-
         self._startTime = time.time()
-        #THIS ONLY WORKS IF THE MAZE IS BLOCKED IN ALL DIRECTIONS, CHANGE IT SO IT DOESNT HAVE TO BE
-
-        print(self._start)
-
         if self._start[0] == 1:
             self._mazeMap[self._maze.getStartPos[0], self._maze.getStartPos[1]]["W"] = 1
         if self._start[0] == self._maze.getWidth:
