@@ -24,14 +24,6 @@ class Ui:
         self._solveTime = 0.05
         self._isPaused = False
         self._isGeneration = False
-        '''
-        self.mydb = mysql.connector.connect(
-            host="localhost",
-            user="Test",
-            password="Test",
-            database="Maze"
-        )
-        '''
 
 class Terminal(Ui):
     def __init__(self):
@@ -44,7 +36,9 @@ class GUI(Ui):
         super().__init__()
         pygame.init()
         #Use either 15x15 or 25x25, these work best with the screen size
-        self.__login = False
+        self._login = False
+        self._logout = False
+        self._user = ""
         self._font = pygame.font.Font(None, 50)
         self._font1 = pygame.font.Font(None, 40)
         self._fontDij = pygame.font.Font(None, 37)
@@ -64,7 +58,7 @@ class GUI(Ui):
     def startPanel(self):
         self._main.title("Main")
         mazeButton = tk.Button(self._main, text="Maze",width=20,height=3, command=lambda: [self._main.quit(), self.checkLogin()] )
-        loginButton = tk.Button(self._main, text="Login",width=20,height=3, command=lambda: [self._main.withdraw(), self.loginPanel()])
+        loginButton = tk.Button(self._main, text="Login",width=20,height=3, command=lambda: [self.loginPanel()])
         #registerButton = tk.Button(self._main, text="Register",width=20,height=3, command=lambda: [self.registerPanel()])
         helpButton = tk.Button(self._main, text="Help",width=20, height=3)#, command=self.helpPanel)
         quitButton = tk.Button(self._main, text="Quit",width=20,height=3, command=self._main.destroy)
@@ -76,7 +70,7 @@ class GUI(Ui):
         self._main.mainloop()
 
     def checkLogin(self):
-        if self.__login == True:
+        if self._login == True:
             self._main.destroy()
             self.mazePanel()
         else:
@@ -84,18 +78,19 @@ class GUI(Ui):
             self.loginPanel()
 
     def loginPanel(self):
-        if self.__login == True:
+        if self._login == True:
             tkMessageBox.showinfo("Error", "You are already logged in!", icon="exaclamation")
         else:
             loginScreen = tk.Tk()
             loginScreen.title("Login")
+            loginScreen.attributes("-topmost", True)
             usernameLabel = tk.Label(loginScreen, text="Username")
             passwordLabel = tk.Label(loginScreen, text="Password")
             usernameEntry = tk.Entry(loginScreen)
             passwordEntry = tk.Entry(loginScreen, show="*")
-            loginButton = tk.Button(loginScreen, text="Login", command=lambda: [self.login(usernameEntry.get(), passwordEntry.get()), loginScreen.destroy()])
+            loginButton = tk.Button(loginScreen, text="Login", command=lambda: [self.login(usernameEntry.get(), passwordEntry.get(), loginScreen)])
             registerButton = tk.Button(loginScreen, text="Register", command=lambda: [loginScreen.destroy(), self.registerPanel()])
-            closeButton = tk.Button(loginScreen, text="Close", command=lambda: [loginScreen.destroy(), self._main.deiconify()])
+            closeButton = tk.Button(loginScreen, text="Close", command=lambda: [loginScreen.destroy()])
             usernameLabel.grid(row=0, column=0)
             passwordLabel.grid(row=1, column=0)
             usernameEntry.grid(row=0, column=1)
@@ -108,6 +103,7 @@ class GUI(Ui):
     def registerPanel(self):
         registerScreen = tk.Tk()
         registerScreen.title("Register")
+        registerScreen.attributes("-topmost", True)
         usernameLabel = tk.Label(registerScreen, text="Username")
         passwordLabel = tk.Label(registerScreen, text="Password")
         passwordLabel2 = tk.Label(registerScreen, text="Confirm Password")
@@ -116,7 +112,7 @@ class GUI(Ui):
         usernameEntry = tk.Entry(registerScreen)
         passwordEntry = tk.Entry(registerScreen, show="*")
         passwordEntry2 = tk.Entry(registerScreen, show="*")
-        registerButton = tk.Button(registerScreen, text="Register", command=lambda: [self.checkPasswordMatch(usernameEntry.get(), passwordEntry.get(), passwordEntry2.get())])
+        registerButton = tk.Button(registerScreen, text="Register", command=lambda: [self.checkPasswordMatch(usernameEntry.get(), passwordEntry.get(), passwordEntry2.get(), registerScreen)])
         usernameLabel.grid(row=0, column=0)
         passwordLabel.grid(row=1, column=0)
         passwordLabel2.grid(row=2, column=0)
@@ -128,7 +124,7 @@ class GUI(Ui):
         close.grid(row=3, column=1)
         registerScreen.mainloop()
 
-    def checkPasswordMatch(self, username, password, password2):
+    def checkPasswordMatch(self, username, password, password2, screen):
         if username == "":
             tkMessageBox.showwarning("Error", "Please enter a username!", icon="warning")
         elif password == "":
@@ -136,7 +132,7 @@ class GUI(Ui):
         elif password2 == "":
             tkMessageBox.showwarning("Error", "Please confirm your password!", icon="warning")
         if password == password2 and password != "" and password2 != "":
-            self.register(username, password)
+            self.register(username, password, screen)
         elif password != password2 and password != "" and password2 != "":
             tkMessageBox.showwarning("Error", "Passwords do not match!", icon="warning")
 
@@ -185,8 +181,10 @@ class GUI(Ui):
         startPosbox.grid(row=4, column=1)
         endPosbox.grid(row=5, column=1)
         BTdropDown.grid(row=6, column=1)
+        logoutButton = tk.Button(self._settings, text="Logout", command=lambda: [self._settings.destroy(), self.logout()])
         applyButton = tk.Button(self._settings, text="Apply", command=lambda: [self.applyButton(hBox, wBox, speedSliderSearch, speedSliderSolve, startPosbox, endPosbox, BTDropDownclick), self._settings.destroy(), self.mazePanel()])
         applyButton.grid(row=7, column=0)
+        logoutButton.grid(row=9, column=0)
         self._settings.mainloop()
 
     def applyButton(self, hBox, wBox, speedSliderSearch, speedSliderSolve, startPosbox, endPosbox, BTDropDownClick):
@@ -219,12 +217,10 @@ class GUI(Ui):
 
     def mazePanel(self):
         self._mazeScreen = pygame.display.set_mode((1375,850), flags=pygame.SHOWN)
+        print(self._mazeScreen)
         self._mazeScreen.fill((255,255,255))
         self.drawMaze(self._mazeGen.getMazeMap)
         self.drawButtons()
-        #self.drawMazeTest(self._mazeMap)
-        #C:\Users\Tim Ziegert\AppData\Local\Programs\Python\Python310
-        #self.dataBase()
         pygame.display.update()
         running = True
         while running:
@@ -914,20 +910,30 @@ class GUI(Ui):
     def customise(self):
         ... #Customise, colours, etc
 
-    def login(self, username, password):
-        print("Login")
-        print(username)
-        print(password)
-        self.mazePanel()
+    def login(self, username, password, screen):
+        if loginDataBase(username, password) == True:
+            self._user = username
+            self._logout = False
+            self._main.withdraw()
+            screen.destroy()
+            self.mazePanel()
+        else:
+            tkMessageBox.showerror("Error", "Your username or password is incorrect")
 
-    def register(self, username, password):
-        print("Register")
-        print(username)
-        print(password)
-        
+    def register(self, username, password, screen):
+        if registerDataBase(username, password) == "Taken":
+            tkMessageBox.showerror("Error", "This username has already been taken")
+        else:
+            tkMessageBox.showinfo("Success", "You have successfully created a new account!")
+            screen.destroy()
 
     def logout(self):
-        ...
+        pygame.quit()
+        self._user = ""
+        self._login = False
+        self._logout = True
+        tempGui = GUI()
+        tempGui.run()
 
     def createAccount(self):
         ...

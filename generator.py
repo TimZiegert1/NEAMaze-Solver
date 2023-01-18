@@ -267,7 +267,6 @@ class HuntAndKill(Generator):
     def algorithm(self, x, y):
         self._stack.append(self.findNextMove(x,y))
         if self.checkSolved() == True:
-            print(self._lastSolvedLine)
             self._stack.pop()
             self.changeCellType(self._maze.getStartPos[0], self._maze.getStartPos[1], 3)
             self.changeCellType(self._maze.getEndPos[0], self._maze.getEndPos[1], 4)
