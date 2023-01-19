@@ -13,7 +13,7 @@ c.execute("""CREATE TABLE IF NOT EXISTS Users (
         )""")
 
 c.execute("""CREATE TABLE IF NOT EXISTS MazeSave(
-    UserKey integer,
+    User text,
     MazeName text PRIMARY KEY,
     MazeData blob
 )""")
@@ -45,7 +45,26 @@ def registerDataBase(username:str, password:str):
         #print("This username is already in use")
         return "Taken"
 
+def saveMazeDataBase(username:str, mazeName:str, mazeData:dict):
+    try:
+        c.execute("""
+            INSERT INTO MazeSave (User, MazeName, MazeData)
+            VALUES (:name, :mazeName, :mazeData)
+        """, {"name": f"{username}", "mazeName": f"{mazeName}", "mazeData": f"{mazeData}"})
+        conn.commit()
+    except sqlite3.IntegrityError:
+        #print("This name is already in use")
+        return "Taken"
 
+def loadMazeDataBase(username:str, mazeName:str):
+    c.execute(
+    "SELECT MazeData FROM MazeSave WHERE User = :name AND MazeName = :mazeName", {"name": f"{username}", "mazeName": f"{mazeName}"}
+    )
+    mazeData = c.fetchone()
+    if mazeData:
+        return mazeData[0]
+    else:
+        return False
 
 #register("admin2", "admin")
 

@@ -1,5 +1,5 @@
 import random
-
+import copy
 class MazeGen():
     def __init__(self, height:int=15, width:int=15):
         self._height = height

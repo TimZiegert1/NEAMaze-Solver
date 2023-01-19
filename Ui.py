@@ -52,6 +52,7 @@ class GUI(Ui):
         self.__yWall = self.getRescaleValue(self._width, self._height)[3]
         self.__BTdirection = "NW"
 
+
     def run(self):
         self.startPanel()
 
@@ -169,7 +170,7 @@ class GUI(Ui):
         speedSliderSolve.set(self._solveTime)
         startPosbox = tk.Entry(self._settings, width=5)
         endPosbox = tk.Entry(self._settings, width=5)
-        BTDropDownclick = tk.StringVar()
+        BTDropDownclick = tk.StringVar(self._settings)
         BTDropDownclick.set("NW")
         BTdropDown = tk.OptionMenu(self._settings, BTDropDownclick, "NW", "NE", "SW", "SE")
         #self._wSlider.grid(row=0, column=1)
@@ -184,7 +185,7 @@ class GUI(Ui):
         logoutButton = tk.Button(self._settings, text="Logout", command=lambda: [self._settings.destroy(), self.logout()])
         applyButton = tk.Button(self._settings, text="Apply", command=lambda: [self.applyButton(hBox, wBox, speedSliderSearch, speedSliderSolve, startPosbox, endPosbox, BTDropDownclick), self._settings.destroy(), self.mazePanel()])
         applyButton.grid(row=7, column=0)
-        logoutButton.grid(row=9, column=0)
+        logoutButton.grid(row=8, column=0)
         self._settings.mainloop()
 
     def applyButton(self, hBox, wBox, speedSliderSearch, speedSliderSolve, startPosbox, endPosbox, BTDropDownClick):
@@ -354,6 +355,16 @@ class GUI(Ui):
                         self._mazeGen = MazeGen(self._height, self._width)
                         self.drawMaze(self._mazeGen.getMazeMap)
                         self._isGeneration = False
+                #Save Maze
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    mouse = pygame.mouse.get_pos()
+                    if mouse[0] > 885 and mouse[1] > 695 and mouse[1] < 755 and mouse[0] < 995:
+                        self.saveMaze()
+                #Load Maze
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    mouse = pygame.mouse.get_pos()
+                    if mouse[0] > 1045 and mouse[1] > 695 and mouse[1] < 755 and mouse[0] < 1155:
+                        self.loadMaze()
                 #Hovers
                 if event.type == pygame.MOUSEMOTION:
                     mouse = pygame.mouse.get_pos()
@@ -412,12 +423,12 @@ class GUI(Ui):
                     else:
                         self.clearButton(self._mazeScreen, self._bColour ,(1210, 580,100, 50), "Clear")
                         pygame.display.update()
-                    if mouse[0] > 885 and mouse[1] > 695 and mouse[1] < 805 and mouse[0] < 995:
+                    if mouse[0] > 885 and mouse[1] > 695 and mouse[1] < 755 and mouse[0] < 995:
                         self.saveHover()
                     else:
                         self.saveButton(self._mazeScreen, self._bColour ,(890, 700,100, 50), "Save")
                         pygame.display.update()
-                    if mouse[0] > 1045 and mouse[1] > 695 and mouse[1] < 805 and mouse[0] < 1155:
+                    if mouse[0] > 1045 and mouse[1] > 695 and mouse[1] < 755 and mouse[0] < 1155:
                         self.loadHover()
                     else:
                         self.loadButton(self._mazeScreen, self._bColour ,(1050, 700,100, 50), "Load")
@@ -965,13 +976,58 @@ class GUI(Ui):
         tempGui = GUI()
         tempGui.run()
 
-    def createAccount(self):
-        ...
-
-    def importMaze(self):
-        ...
-
     def saveMaze(self):
-        ...
+        saveMazeWindow = tk.Tk()
+        saveMazeWindow.title("Save Maze")
+        mazeName = tk.Label(saveMazeWindow, text="Maze Name")
+        mazeName.grid(row=0, column=0)
+        mazeNameEntry = tk.Entry(saveMazeWindow)
+        mazeNameEntry.grid(row=0, column=1)
+        saveButton = tk.Button(saveMazeWindow, text="Save", command=lambda: [self.saveMazeCheck(mazeNameEntry.get(), saveMazeWindow)])
+        saveButton.grid(row=1, column=0)
+        closeButton = tk.Button(saveMazeWindow, text="Close", command=lambda: [saveMazeWindow.withdraw(), self.mazePanel()])
+        closeButton.grid(row=1, column=1)
+        saveMazeWindow.mainloop()
+
+    def saveMazeCheck(self, name, screen):
+        if saveMazeDataBase(self._user, name, self._mazeGen.getMazeMap) == "Taken":
+            tkMessageBox.showerror("Error", "This name has already been taken")
+        else:
+            tkMessageBox.showinfo("Success", "You have successfully saved your maze!")
+            screen.destroy()
+            self.mazePanel()
+
+    def loadMaze(self):
+        loadMazeWindow = tk.Tk()
+        loadMazeWindow.title("Load Maze")
+        mazeName = tk.Label(loadMazeWindow, text="Maze Name")
+        mazeName.grid(row=0, column=0)
+        mazeNameEntry = tk.Entry(loadMazeWindow)
+        mazeNameEntry.grid(row=0, column=1)
+        loadButton = tk.Button(loadMazeWindow, text="Load", command=lambda: [self.loadMazeCheck(mazeNameEntry.get(), loadMazeWindow)])
+        loadButton.grid(row=1, column=0)
+        closeButton = tk.Button(loadMazeWindow, text="Close", command=lambda: [loadMazeWindow.withdraw(), self.mazePanel()])
+        closeButton.grid(row=1, column=1)
+        loadMazeWindow.mainloop()
+
+    def loadMazeCheck(self, name, screen):
+        #loadedMaze RETURNS A STRING NOT A DICT
+        loadedMaze = loadMazeDataBase(self._user, name)
+        if loadedMaze == False:
+            tkMessageBox.showerror("Error", "This maze does not exist")
+        else:
+            tkMessageBox.showinfo("Success", "You have successfully loaded your maze!")
+            screen.destroy()
+            self._isGeneration = True
+            self._mazeGen.setMazeMap(eval(loadedMaze))
+            '''
+            for cell in self._mazeGen.getMazeMap:
+                if self._mazeGen.getMazeMap[cell[0], cell[1]] == 3:
+                    self._mazeGen.setStartPos(cell)
+                if self._mazeGen.getMazeMap[cell[0], cell[1]] == 4:
+                    self._mazeGen.setEndPos(cell)
+            '''
+            self.mazePanel()
+
 
     
