@@ -103,6 +103,7 @@ class Terminal(Ui):
         print("Maze solved!")
         for cell in self._mazeGen.getMazeMap:
             if self._mazeGen.getMazeMap[cell[0], cell[1]]["Type"] == 2:
+                self._searched.append(cell)
                 self._solution.append(cell)
         for cell in self._mazeGen.getMazeMap:
             if self._mazeGen.getMazeMap[cell[0], cell[1]]["Type"] == 5:
@@ -145,7 +146,7 @@ class GUI(Ui):
         mazeButton = tk.Button(self._main, text="Maze",width=20,height=3, command=lambda: [self._main.quit(), self.checkLogin()] )
         loginButton = tk.Button(self._main, text="Login",width=20,height=3, command=lambda: [self.loginPanel()])
         #registerButton = tk.Button(self._main, text="Register",width=20,height=3, command=lambda: [self.registerPanel()])
-        helpButton = tk.Button(self._main, text="Help",width=20, height=3)#, command=self.helpPanel)
+        helpButton = tk.Button(self._main, text="Help",width=20, height=3, command=self.helpPanel)
         quitButton = tk.Button(self._main, text="Quit",width=20,height=3, command=self._main.destroy)
         mazeButton.grid(row=0, column=0)
         loginButton.grid(row=1, column=0)
@@ -221,8 +222,30 @@ class GUI(Ui):
         elif password != password2 and password != "" and password2 != "":
             tkMessageBox.showwarning("Error", "Passwords do not match!", icon="warning")
 
-    def helpButton(self):
-        ...
+    def helpPanel(self):
+        helpWindow = tk.Tk()
+        helpWindow.title("Help")
+        helpWindow.attributes("-topmost", True)
+        helpText = tk.Label(helpWindow, text="Welcome to the help page, here you can find information about the program and how to use it.")
+        helpText2 = tk.Label(helpWindow, text="To use the program, you must first login or register")
+        helpText3 = tk.Label(helpWindow, text="To log in or register, click the login button on the main menu, then if you need to register there is a button to do so in the login panel")
+        helpText4 = tk.Label(helpWindow, text="Once you have logged in, you will have a variaty of options")
+        helpText5 = tk.Label(helpWindow, text="You can generate a maze, solve a maze, change the settings, or logout")
+        helpText6 = tk.Label(helpWindow, text="In the settings panel you are able to change the width and height of the maze, and the speed of the maze generation")
+        helpText7 = tk.Label(helpWindow, text="You can also select the start and end position and change the direction of the Binary Search Tree algorithm")
+        helpText8 = tk.Label(helpWindow, text="I hope you enjoy using this program!")
+        closeButton = tk.Button(helpWindow, text="Close", command=lambda: [helpWindow.destroy()])
+        helpText.grid(row=0, column=0)
+        helpText2.grid(row=1, column=0)
+        helpText3.grid(row=2, column=0)
+        helpText4.grid(row=3, column=0)
+        helpText5.grid(row=4, column=0)
+        helpText6.grid(row=5, column=0)
+        helpText7.grid(row=6, column=0)
+        helpText8.grid(row=7, column=0)
+        closeButton.grid(row=8, column=0)
+        helpWindow.mainloop()
+
 
     def settingsPanel(self):
         self._settings = tk.Tk()
