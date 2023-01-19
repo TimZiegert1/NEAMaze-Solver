@@ -33,6 +33,7 @@ class Terminal(Ui):
     def __init__(self):
         super().__init__()  
         self._solution = []
+        self._searched = []
         self._generateOptions = {
             1: "RBT",
             2: "HuntAndKill",
@@ -103,8 +104,12 @@ class Terminal(Ui):
         for cell in self._mazeGen.getMazeMap:
             if self._mazeGen.getMazeMap[cell[0], cell[1]]["Type"] == 2:
                 self._solution.append(cell)
+        for cell in self._mazeGen.getMazeMap:
+            if self._mazeGen.getMazeMap[cell[0], cell[1]]["Type"] == 5:
+                self._searched.append(cell)
         print(f"MAZE MAP SOLVED: {self._mazeGen.getMazeMap}")
-        print(self._solution)
+        print(f"SEARCHED: {self._searched}")
+        print(f"SOLUTION: {self._solution}")
                 
         
 
