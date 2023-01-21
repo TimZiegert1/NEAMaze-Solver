@@ -77,11 +77,16 @@ class DFS(Solver):
 
     def deadEnd(self):
         self._stack.pop()
+        if len(self._stack) != 0:
+            self._stackSearched.append(self._stack[-1])
         if self.findNextMove(self._stack[-1][0], self._stack[-1][1]) == "DeadEnd":
             self.deadEnd()
 
     def solve(self, x:int, y:int):
         if self.checkIsEnd(x, y) == "End":
+            for item in self._stackSearched:
+                if item == "DeadEnd":
+                    self._stackSearched.remove(item)
             print("Solved")
             self._endTime = time.time()
             self.setSolution()
@@ -91,8 +96,7 @@ class DFS(Solver):
             self._stack = []
             return self._stackSearched, self._tempStack
         self._stack.append(self.findNextMove(x, y))
-        if self._stack[-1] != "DeadEnd":
-            self._stackSearched.append(self._stack[-1])
+        self._stackSearched.append(self._stack[-1])
         if self._stack[-1] == "DeadEnd":
             self.deadEnd()
         try:
