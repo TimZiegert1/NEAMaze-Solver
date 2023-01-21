@@ -132,7 +132,7 @@ class Generator:
 #                                                            #
 ##############################################################
 
-class RDFS(Generator):
+class RBT(Generator):
     def __init__(self, mazeGen):
         super().__init__(mazeGen)
         self._stack = []

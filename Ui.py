@@ -22,7 +22,7 @@ class Ui:
             "search": (50,50,50),
             "solve": (255,0,50),
             "button": (225,225,225),
-            "headPointer": (0,195,195)
+            "hover": (0,195,195)
         }
         self._searchTime = 0.15
         self._solveTime = 0.05
@@ -32,14 +32,14 @@ class Ui:
 class Terminal(Ui):
     def __init__(self):
         super().__init__()  
-        self._solution = []
-        self._searched = []
-        self._generateOptions = {
+        self.__solution = []
+        self.__searched = []
+        self.__generateOptions = {
             1: "RBT",
             2: "HuntAndKill",
             3: "BinarySearchTree",
         }
-        self._solveOptions = {
+        self.__solveOptions = {
             1: "RDFS",
             2: "BFS",
             3: "Dijkstra",
@@ -66,11 +66,11 @@ class Terminal(Ui):
 
     def generate(self):
         print("Choose a generation algorithm:")
-        for key, value in self._generateOptions.items():
+        for key, value in self.__generateOptions.items():
             print(f"{key}: {value}")
         choice = int(input("Enter choice: "))
         if choice == 1:
-            RDFS(self._mazeGen).run()
+            RBT(self._mazeGen).run()
         elif choice == 2:
             HuntAndKill(self._mazeGen).run()
         elif choice == 3:
@@ -84,8 +84,7 @@ class Terminal(Ui):
             print("Goodbye!")
 
     def solve(self):
-
-        for key, value in self._solveOptions.items():
+        for key, value in self.__solveOptions.items():
             print(f"{key}: {value}")
         choice = int(input("Enter choice: "))
         if choice == 1:
@@ -103,14 +102,14 @@ class Terminal(Ui):
         print("Maze solved!")
         for cell in self._mazeGen.getMazeMap:
             if self._mazeGen.getMazeMap[cell[0], cell[1]]["Type"] == 2:
-                self._searched.append(cell)
-                self._solution.append(cell)
+                self.__searched.append(cell)
+                self.__solution.append(cell)
         for cell in self._mazeGen.getMazeMap:
             if self._mazeGen.getMazeMap[cell[0], cell[1]]["Type"] == 5:
-                self._searched.append(cell)
+                self.__searched.append(cell)
         print(f"MAZE MAP SOLVED: {self._mazeGen.getMazeMap}")
-        print(f"SEARCHED: {self._searched}")
-        print(f"SOLUTION: {self._solution}")
+        print(f"SEARCHED: {self.__searched}")
+        print(f"SOLUTION: {self.__solution}")
                 
         
 
@@ -340,7 +339,7 @@ class GUI(Ui):
                 #Quit button
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     mouse = pygame.mouse.get_pos()
-                    if mouse[0] > 1280 and mouse[1] > 790 and mouse[1] < 840 and mouse[0] < 1380:
+                    if mouse[0] > 1255 and mouse[1] > 775 and mouse[1] < 835 and mouse[0] < 1365:
                         running = False
                         break
                 if event.type == pygame.MOUSEBUTTONDOWN:
@@ -430,7 +429,7 @@ class GUI(Ui):
                     if mouse[0] > 885 and mouse[1] > 505 and mouse[1] < 565 and mouse[0] < 995 and self._isGeneration == False:
                         #self._gen.findNextMove(self._gen.startPoint[0], self._gen.startPoint[1])
                         self._isGeneration = True
-                        self._RDFS = RDFS(self._mazeGen)
+                        self._RDFS = RBT(self._mazeGen)
                         #print(self._RDFS.getGen)
                         self._RDFS.run()
                         genStack = self._RDFS.getGen
@@ -475,9 +474,15 @@ class GUI(Ui):
                 #Hovers
                 if event.type == pygame.MOUSEMOTION:
                     mouse = pygame.mouse.get_pos()
+                    #quit hover
+                    if mouse[0] > 1255 and mouse[1] > 775 and mouse[1] < 835 and mouse[0] < 1365:
+                        self.quitHover()
+                    else:
+                        self.quitButton(self._mazeScreen, self._colours["button"] ,(1260,780,100, 50), "Quit")
+                        pygame.display.update()
                     if mouse[0] > 885 and mouse[1] > 145 and mouse[1] < 205 and mouse[0] < 995:
                         self.solveRDFSHover()
-                        self.solveText("This is a test")
+                        #self.solveText("This is a test")
                     else:
                         self.solveRDFSButton(self._mazeScreen, (225,225,225) ,(890, 150,100, 50), "RDFS")
                         pygame.display.update()
@@ -670,7 +675,7 @@ class GUI(Ui):
                 #Quit Button
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     mouse = pygame.mouse.get_pos()
-                    if mouse[0] > 1280 and mouse[1] > 790 and mouse[1] < 840 and mouse[0] < 1380:
+                    if mouse[0] > 1255 and mouse[1] > 775 and mouse[1] < 835 and mouse[0] < 1365:
                         pygame.quit()
                         quit()
                 #Settings Button
@@ -844,7 +849,7 @@ class GUI(Ui):
         self.pauseButton(self._mazeScreen, pygame.image.load("img\pause.png") ,(1075, 780))
         self.stepButton(self._mazeScreen, pygame.image.load("img\stepButton.png") ,(1150, 780))
         self.stepBackButton(self._mazeScreen, pygame.image.load("img\stepBackButton.png") ,(1000, 780))
-        self.quitButton(self._mazeScreen, self._colours["white"] ,(1270, 790,100, 50), "Quit")
+        self.quitButton(self._mazeScreen, self._colours["button"] ,(1260, 780,100, 50), "Quit")
 
         self.solveRDFSButton(self._mazeScreen, self._colours["button"] ,(890, 150,100, 50), "RDFS")
         self.solveBFSButton(self._mazeScreen, self._colours["button"] ,(1050, 150,100, 50), "BFS")
@@ -863,9 +868,15 @@ class GUI(Ui):
         self.loadButton(self._mazeScreen, self._colours["button"] ,(1050, 700, 100, 50), "Load")
 
     def quitButton(self, screen, colour, pos, text:str):
-        quitButton = pygame.draw.rect(screen, colour, pos)
-        quitText = self._font.render(text, True, (255,0,0))
+        pygame.draw.rect(screen, self._colours["black"], (1255,775,110,60), border_radius=18)
+        quitButton = pygame.draw.rect(screen, colour, pos, border_radius=15)
+        quitText = self._font.render(text, True, (0,0,0))
         screen.blit(quitText, quitText.get_rect(center=quitButton.center))
+
+    def quitHover(self):
+        quitButton = pygame.draw.rect(self._mazeScreen, self._colours["hover"],(1260, 780,100, 50), border_radius=15)
+        quitText = self._font.render("Quit", True, (255,0,0))
+        self._mazeScreen.blit(quitText, quitText.get_rect(center=quitButton.center))
 
     def solveRDFSButton(self, screen, colour, pos, text:str):
         pygame.draw.rect(screen, self._colours["black"], (885,145,110,60), border_radius=18)
@@ -875,7 +886,7 @@ class GUI(Ui):
     
     def solveRDFSHover(self):
         #pygame.draw.rect(self._mazeScreen, self._black, (885,145,110,60), border_radius=18)
-        solveButton = pygame.draw.rect(self._mazeScreen, self._colours["headPointer"],(890, 150,100, 50), border_radius=15)
+        solveButton = pygame.draw.rect(self._mazeScreen, self._colours["hover"],(890, 150,100, 50), border_radius=15)
         solveText = self._font1.render("RDFS", True, (0,0,0))
         self._mazeScreen.blit(solveText, solveText.get_rect(center=solveButton.center))
         pygame.display.update()
@@ -887,7 +898,7 @@ class GUI(Ui):
         screen.blit(solveText, solveText.get_rect(center=solveButton.center))
 
     def solveBFSHover(self):
-        solveButton = pygame.draw.rect(self._mazeScreen, self._colours["headPointer"], (1050, 150,100, 50), border_radius=15)
+        solveButton = pygame.draw.rect(self._mazeScreen, self._colours["hover"], (1050, 150,100, 50), border_radius=15)
         solveText = self._font1.render("BFS", True, (0,0,0))
         self._mazeScreen.blit(solveText, solveText.get_rect(center=solveButton.center))
         pygame.display.update()
@@ -899,7 +910,7 @@ class GUI(Ui):
         screen.blit(solveText, solveText.get_rect(center=solveButton.center))
     
     def solveDijkstraHover(self):
-        solveButton = pygame.draw.rect(self._mazeScreen, self._colours["headPointer"], (1210, 150,100, 50), border_radius=15)
+        solveButton = pygame.draw.rect(self._mazeScreen, self._colours["hover"], (1210, 150,100, 50), border_radius=15)
         solveText = self._fontDij.render("Dijkstra", True, (0,0,0))
         self._mazeScreen.blit(solveText, solveText.get_rect(center=solveButton.center))
         pygame.display.update()
@@ -911,7 +922,7 @@ class GUI(Ui):
         screen.blit(solveText, solveText.get_rect(center=solveButton.center))
 
     def solveAStarHover(self):
-        solveButton = pygame.draw.rect(self._mazeScreen, self._colours["headPointer"], (890, 220,100, 50), border_radius=15)
+        solveButton = pygame.draw.rect(self._mazeScreen, self._colours["hover"], (890, 220,100, 50), border_radius=15)
         solveText = self._font1.render("A*", True, (0,0,0))
         self._mazeScreen.blit(solveText, solveText.get_rect(center=solveButton.center))
         pygame.display.update()
@@ -923,7 +934,7 @@ class GUI(Ui):
         screen.blit(solveText, solveText.get_rect(center=solveButton.center))
 
     def solveRHWHover(self):
-        solveButton = pygame.draw.rect(self._mazeScreen, self._colours["headPointer"], (1050, 220,100, 50), border_radius=15)
+        solveButton = pygame.draw.rect(self._mazeScreen, self._colours["hover"], (1050, 220,100, 50), border_radius=15)
         solveText = self._font1.render("RHW", True, (0,0,0))
         self._mazeScreen.blit(solveText, solveText.get_rect(center=solveButton.center))
         pygame.display.update()
@@ -935,7 +946,7 @@ class GUI(Ui):
         screen.blit(solveText, solveText.get_rect(center=solveButton.center))
     
     def solveLHWHover(self):
-        solveButton = pygame.draw.rect(self._mazeScreen, self._colours["headPointer"], (1210, 220,100, 50), border_radius=15)
+        solveButton = pygame.draw.rect(self._mazeScreen, self._colours["hover"], (1210, 220,100, 50), border_radius=15)
         solveText = self._font1.render("LHW", True, (0,0,0))
         self._mazeScreen.blit(solveText, solveText.get_rect(center=solveButton.center))
         pygame.display.update()
@@ -947,7 +958,7 @@ class GUI(Ui):
         screen.blit(clearText, clearText.get_rect(center=clearButton.center))
     
     def clearSolveHover(self):
-        clearButton = pygame.draw.rect(self._mazeScreen, self._colours["headPointer"], (1210, 380,100, 50), border_radius=15)
+        clearButton = pygame.draw.rect(self._mazeScreen, self._colours["hover"], (1210, 380,100, 50), border_radius=15)
         clearText = self._font1.render("Clear", True, (0,0,0))
         self._mazeScreen.blit(clearText, clearText.get_rect(center=clearButton.center))
         pygame.display.update()
@@ -959,7 +970,7 @@ class GUI(Ui):
         screen.blit(runText, runText.get_rect(center=runButton.center))
 
     def rdfsGenHover(self): 
-        runButton = pygame.draw.rect(self._mazeScreen, self._colours["headPointer"], (890, 510,100, 50), border_radius=15)
+        runButton = pygame.draw.rect(self._mazeScreen, self._colours["hover"], (890, 510,100, 50), border_radius=15)
         runText = self._font1.render("RBT", True, (0,0,0))
         self._mazeScreen.blit(runText, runText.get_rect(center=runButton.center))
         pygame.display.update()
@@ -971,7 +982,7 @@ class GUI(Ui):
         screen.blit(runText, runText.get_rect(center=runButton.center))
 
     def huntAndKillHover(self):
-        runButton = pygame.draw.rect(self._mazeScreen, self._colours["headPointer"], (1050, 510,100, 50), border_radius=15)
+        runButton = pygame.draw.rect(self._mazeScreen, self._colours["hover"], (1050, 510,100, 50), border_radius=15)
         runText = self._font2.render("Hunt&Kill", True, (0,0,0))
         self._mazeScreen.blit(runText, runText.get_rect(center=runButton.center))
         pygame.display.update()
@@ -983,7 +994,7 @@ class GUI(Ui):
         screen.blit(runText, runText.get_rect(center=runButton.center))
 
     def binaryTreeHover(self):
-        runButton = pygame.draw.rect(self._mazeScreen, self._colours["headPointer"], (1210, 510,100, 50), border_radius=15)
+        runButton = pygame.draw.rect(self._mazeScreen, self._colours["hover"], (1210, 510,100, 50), border_radius=15)
         runText = self._font1.render("BST", True, (0,0,0))
         self._mazeScreen.blit(runText, runText.get_rect(center=runButton.center))
         pygame.display.update()
@@ -995,7 +1006,7 @@ class GUI(Ui):
         screen.blit(clearText, clearText.get_rect(center=clearButton.center))
 
     def clearHover(self):
-        clearButton = pygame.draw.rect(self._mazeScreen, self._colours["headPointer"], (1210, 580, 100, 50), border_radius=15)
+        clearButton = pygame.draw.rect(self._mazeScreen, self._colours["hover"], (1210, 580, 100, 50), border_radius=15)
         clearText = self._font.render("Clear", True, (0,0,0))
         self._mazeScreen.blit(clearText, clearText.get_rect(center=clearButton.center))
         pygame.display.update()
@@ -1038,7 +1049,7 @@ class GUI(Ui):
         screen.blit(saveText, saveText.get_rect(center=saveButton.center))
 
     def saveHover(self):
-        saveButton = pygame.draw.rect(self._mazeScreen, self._colours["headPointer"], (890, 700, 100, 50), border_radius=15)
+        saveButton = pygame.draw.rect(self._mazeScreen, self._colours["hover"], (890, 700, 100, 50), border_radius=15)
         saveText = self._font.render("Save", True, (0,0,0))
         self._mazeScreen.blit(saveText, saveText.get_rect(center=saveButton.center))
         pygame.display.update()
@@ -1050,7 +1061,7 @@ class GUI(Ui):
         screen.blit(loadText, loadText.get_rect(center=loadButton.center))
 
     def loadHover(self):
-        loadButton = pygame.draw.rect(self._mazeScreen, self._colours["headPointer"], (1050, 700, 100, 50), border_radius=15)
+        loadButton = pygame.draw.rect(self._mazeScreen, self._colours["hover"], (1050, 700, 100, 50), border_radius=15)
         loadText = self._font.render("Load", True, (0,0,0))
         self._mazeScreen.blit(loadText, loadText.get_rect(center=loadButton.center))
         pygame.display.update()
