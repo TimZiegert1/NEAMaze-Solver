@@ -300,13 +300,6 @@ class GUI(Ui):
         else:
             self._width = int(wBox.get())
             self._height = int(hBox.get())
-        if startPosbox.get() == "" or endPosbox.get() == "" or endPosbox.get().isdigit() == False or endPosbox.get().isdigit() == False or int(startPosbox.get()) <= 0 or int(endPosbox.get()) <= 0 or int(startPosbox.get()) > self._mazeGen.getWidth or int(endPosbox.get()) > self._mazeGen.getWidth:
-            pass
-        else:
-            self._mazeGen.getMazeMap[self._mazeGen.getStartPos]["Type"] = 0
-            self._mazeGen.getMazeMap[self._mazeGen.getEndPos]["Type"] = 0
-            self._mazeGen.getMazeMap[int(startPosbox.get())].setStartPos()
-            self._mazeGen.getMazeMap[int(endPosbox.get())].setEndPos()
         self._searchTime = speedSliderSearch.get()
         self._solveTime = speedSliderSolve.get()
         self._mazeGen = MazeGen(self._height, self._width)
@@ -316,6 +309,25 @@ class GUI(Ui):
         self.__yBox = self.getRescaleValue(self._width, self._height)[1]
         self.__xWall = self.getRescaleValue(self._width, self._height)[2]
         self.__yWall = self.getRescaleValue(self._width, self._height)[3]
+        #if startPosbox.get() == "" or endPosbox.get() == "" or endPosbox.get().isdigit() == False or endPosbox.get().isdigit() == False or int(startPosbox.get()) <= 0 or int(endPosbox.get()) <= 0 or int(startPosbox.get()) > self._mazeGen.getWidth or int(endPosbox.get()) > self._mazeGen.getWidth:
+            #pass
+        #else:
+        self._mazeGen.getMazeMap[tuple(self._mazeGen.getStartPos)]["Type"] = 0
+        self._mazeGen.getMazeMap[tuple(self._mazeGen.getEndPos)]["Type"] = 0
+        if len(startPosbox.get()) < 3 and len(endPosbox.get()) < 3:
+            start = (int(startPosbox.get()[0]), int(startPosbox.get()[1]))
+            end = (int(endPosbox.get()[0]), int(endPosbox.get()[1]))
+        elif len(startPosbox.get()) < 3 and len(endPosbox.get()) > 3:
+            start = (int(startPosbox.get()[0]), int(startPosbox.get()[1]))
+            end = (int(endPosbox.get()[0:2]), int(endPosbox.get()[2:4]))
+        elif len(startPosbox.get()) > 3 and len(endPosbox.get()) < 3:
+            start = (int(startPosbox.get()[0:2]), int(startPosbox.get()[2:4]))
+            end = (int(endPosbox.get()[0]), int(endPosbox.get()[1]))
+        else:
+            start = (int(startPosbox.get()[0:2]), int(startPosbox.get()[2:4]))
+            end = (int(endPosbox.get()[0:2]), int(endPosbox.get()[2:4]))
+        self._mazeGen.setStartPos(start)
+        self._mazeGen.setEndPos(end)
         self.drawMaze(self._mazeGen.getMazeMap)
         self._isGeneration = False
         self._settings.destroy()

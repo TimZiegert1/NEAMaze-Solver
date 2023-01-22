@@ -190,7 +190,6 @@ class HuntAndKill(Generator):
         self._lastSolvedLine = 1
 
     def run(self):
-        self.changeCellType(self._maze.getStartPos[0], self._maze.getStartPos[1], 0)
         self.changeCellType(self._maze.getEndPos[0], self._maze.getEndPos[1], 0)
         self.algorithm(self._maze.getStartPos[0], self._maze.getStartPos[1])
 
