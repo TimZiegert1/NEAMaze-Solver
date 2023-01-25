@@ -1,9 +1,7 @@
 import random
 from mazeGen import *
-import sys
 import copy
 
-#sys.setrecursionlimit(100)
 class Generator:
     def __init__(self, mazeGen:MazeGen):
         self._maze = mazeGen
@@ -28,43 +26,34 @@ class Generator:
         Checks for a wall on the coords inputed and with change that wall type into a 0 denoting that the wall is removed
         '''
         self._mazeMap[x,y]["N"] = 0
-        #if y-1 > 0:
         try:
             if self._mazeMap[x,y-1]["S"] > 0:
                 self._mazeMap[x,y-1]["S"] = 0
         except KeyError:
-        #elif y-1 ==0:
-            #This mean a Outside wall has been hit
             pass
     
     def delEast(self,x:int,y:int):
         self._mazeMap[x,y]["E"] = 0
         try:
-        #if x+1 < self._maze.getDimentions[0]:
             if self._mazeMap[x+1,y]["W"] > 0:
                 self._mazeMap[x+1,y]["W"] = 0   
         except KeyError:
-        #elif x+1 == self._maze.getDimentions[0]:
             pass
 
     def delSouth(self,x:int,y:int):
         self._mazeMap[x,y]["S"] = 0
         try:
-        #if y+1 < self._maze.getDimentions[1]:
             if self._mazeMap[x,y+1]["N"] > 0:
                 self._mazeMap[x,y+1]["N"] = 0
         except KeyError:
-        #elif y+1 == self._maze.getDimentions[1]:
             pass
 
     def delWest(self,x:int,y:int):
         self._mazeMap[x,y]["W"] = 0
         try:
-        #if x-1 > 0:
             if self._mazeMap[x-1,y]["E"] > 0:
                 self._mazeMap[x-1,y]["E"] = 0
         except KeyError:
-        #elif x-1 == 0:
             pass
 
     def changeCellType(self, x:int, y:int, newCellType:int):
@@ -117,18 +106,11 @@ class Generator:
                 return ("E",x-1, y)
             #As there are no possible moves the maze generator will need to backtrack  
 
-#READ THIS, TURN THIS INTO HUNT AND KILL ALGORITHM LATER
-
-#######################################################
-#                                                     #
-#     CATEGORY A SKILL: ADVANCED STACK OPERATIONS     #
-#     CATEGORY A SKILL: RECURSIVE ALGORITHM           #
-#                                                     #
-#######################################################
-
 ##############################################################
 #                                                            #
-#     CATEGORY A SKILL: COMPLEX USE OF OOP (INHERITENCE)     #        
+#     CATEGORY A SKILL: COMPLEX USE OF OOP (INHERITENCE)     #
+#     CATEGORY A SKILL: ADVANCED STACK OPERATIONS            #
+#     CATEGORY A SKILL: RECURSIVE ALGORITHM                  #
 #                                                            #
 ##############################################################
 
@@ -142,7 +124,6 @@ class RBT(Generator):
         self.changeCellType(self._maze.getEndPos[0], self._maze.getEndPos[1], 0)
         self.generate(self._maze.getStartPos[0], self._maze.getStartPos[1])
 
-    #Change to -1 as it is a stack
     def deadEnd(self):
         self._stack.pop()
         try:
@@ -150,7 +131,6 @@ class RBT(Generator):
                 self.deadEnd()
         except:
             pass
-            #print("Dont hit run twice")
 
     def generate(self, x, y):
         #self._stack.append(self.getStartPos)
@@ -169,7 +149,6 @@ class RBT(Generator):
         try:
             self.changeCellType(self._stack[-1][1],self._stack[-1][2],1)
         except:
-            #print("Dont hit run twice")
             pass
         try:
             self.generate(self._stack[-1][1], self._stack[-1][2])       
@@ -182,6 +161,14 @@ class RBT(Generator):
     @property
     def getGen(self):
         return self._stackGen
+
+##############################################################
+#                                                            #
+#     CATEGORY A SKILL: COMPLEX USE OF OOP (INHERITENCE)     #
+#     CATEGORY A SKILL: ADVANCED STACK OPERATIONS            #
+#     CATEGORY A SKILL: RECURSIVE ALGORITHM                  #
+#                                                            #
+##############################################################
 
 class HuntAndKill(Generator):
     def __init__(self, mazeGen):
@@ -197,26 +184,22 @@ class HuntAndKill(Generator):
         neighCells = []
         try:
             if self._mazeMap[x,y+1]["Type"] == 1: 
-                #self.delSouth(x,y)
                 neighCells.append((x,y+1)) 
                 return "S"
         except KeyError: pass
             #This means that the cell is on the edge of the maze or has been visited
         try:
             if self._mazeMap[x-1,y]["Type"] == 1: 
-                #self.delWest(x,y)
                 neighCells.append((x-1,y))
                 return "W"
         except KeyError:pass 
         try:
             if self._mazeMap[x,y-1]["Type"] == 1: 
-                #self.delNorth(x,y)
                 neighCells.append((x,y-1))
                 return "N"
         except KeyError:pass
         try:
             if self._mazeMap[x+1,y]["Type"] == 1: 
-                #self.delEast(x,y)
                 neighCells.append((x+1,y))
                 return "E"
         except KeyError:pass
@@ -292,6 +275,13 @@ class HuntAndKill(Generator):
             self.algorithm(self._stack[-1][1], self._stack[-1][2]) 
         except:
             pass      
+
+##############################################################
+#                                                            #
+#     CATEGORY A SKILL: COMPLEX USE OF OOP (INHERITENCE)     #
+#     CATEGORY B SKILL: Binary Search                        #
+#                                                            #
+##############################################################
 
 class BinaryTree(Generator):
     def __init__(self, mazeGen: MazeGen):

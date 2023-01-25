@@ -17,6 +17,7 @@ class MazeGen():
 ################################################
 #                                              #
 #     CATEGORY A SKILL: COMPLEX DATA MODEL     #
+#     CATEGORY B SKILL: DICTIONARIES           #
 #                                              #
 ################################################
 

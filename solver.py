@@ -54,12 +54,14 @@ class Solver:
         nextMove.append(random.choice(self.checkNeighCells(x, y)))
         return (nextMove[0][0], nextMove[0][1])
 
-############################################
-#                                          #
-#     CATEGORY A SKILL: RECURSION          #
-#     CATEGORY A SKILL: LIST OPERATION     #
-#                                          #
-############################################
+#############################################################
+#                                                           #
+#     CATEGORY A SKILL: RECURSIVE ALGORITHMS                #
+#     CATEGORY A SKILL: STACK OPERATION                     #
+#     CATEGORY A SKILL: GRAPH TRAVERSAL                     #
+#     CATEGORY A SKILL: COMPLEX USER-DEFINED ALGORITHM      #
+#                                                           #
+#############################################################
 
 class DFS(Solver):
     def __init__(self, mazeGen):
@@ -100,7 +102,6 @@ class DFS(Solver):
         if self._stack[-1] == "DeadEnd":
             self.deadEnd()
         try:
-            #print(self._stack)
             self._mazeMap[self._stack[-1][0], self._stack[-1][1]]["Type"] = 2
         except:
             #this error occurs when the stack is empty, only happens on the second solve in huntandkill
@@ -134,18 +135,19 @@ class DFS(Solver):
         return round((self._endTime - self._startTime), 4)
 
 
-############################################################
-#                                                          #
-#     CATEGORY A SKILL: RECURSION                          #
-#     CATEGORY A SKILL: LIST OPERATION                     #
-#     CATEGORY A SKILL: COMPLEX USER-DEFINED ALGORITHM     #
-#                                                          #
-############################################################
+#############################################################
+#                                                           #
+#     CATEGORY A SKILL: RECURSIVE ALGORITHMS                #
+#     CATEGORY A SKILL: PRIORITY QUEUE OPERATION            #
+#     CATEGORY A SKILL: GRAPH TRAVERSAL                     #
+#     CATEGORY A SKILL: COMPLEX USER-DEFINED ALGORITHM      #
+#     CATEGORY B SKILL: DICTIONARIES                        #
+#                                                           #
+#############################################################
 
 class AStar(Solver):
     def __init__(self, mazeGen: MazeGen):
         super().__init__(mazeGen)
-        #self._qSearch = []
         self._start = tuple(self._startPos)
         self._end = tuple(self._endPos)
         self._searchPath = {}
@@ -206,6 +208,16 @@ class AStar(Solver):
     def getTimeTaken(self):
         return round((self._endTime - self._startTime), 4)
 
+
+#############################################################
+#                                                           #
+#     CATEGORY A SKILL: RECURSIVE ALGORITHMS                #
+#     CATEGORY A SKILL: QUEUE OPERATION                     #
+#     CATEGORY A SKILL: COMPLEX USER-DEFINED ALGORITHM      #
+#     CATEGORY B SKILL: DICTIONARIES                        #
+#                                                           #
+#############################################################
+
 class BFS(Solver):
     def __init__(self, mazeGen:MazeGen):
         super().__init__(mazeGen)
@@ -259,6 +271,15 @@ class BFS(Solver):
     def getTimeTaken(self):
         return round((self._endTime - self._startTime), 4)
 
+#############################################################
+#                                                           #
+#     CATEGORY A SKILL: RECURSIVE ALGORITHMS                #
+#     CATEGORY A SKILL: QUEUE OPERATION                     #
+#     CATEGORY A SKILL: COMPLEX USER-DEFINED ALGORITHM      #
+#     CATEGORY B SKILL: DICTIONARIES                        #
+#                                                           #
+#############################################################
+
 class Dijkstra(Solver):
     def __init__(self, mazeGen:MazeGen) -> None:
         super().__init__(mazeGen)
@@ -276,9 +297,6 @@ class Dijkstra(Solver):
         self._mazeMap[self._endPos[0], self._endPos[1]]["Type"] = 4
         self.solve()
 
-    #The end cell is not being added to the searched list
-    #It sometimes solves it but prints out the wrong path
-    #The search might be a little off
     def solve(self):
         currCell = min(self._unVisited, key=self._unVisited.get)
         if self.checkIsEnd(currCell[0], currCell[1]) == "End" and self._solved == False:
@@ -294,13 +312,11 @@ class Dijkstra(Solver):
                 if tempDist < self._unVisited[childCell]:
                     self._unVisited[childCell] = tempDist
                     self._revPath[childCell] = currCell
-            #if currCell == (self._endPos[0], self._endPos[1]):
             self._unVisited.pop(currCell)
             self.solve()
 
     def setSolution(self):
         cell = tuple(self._maze.getEndPos)
-        #currently getting stuck
         while cell != tuple(self._maze.getStartPos):
             self._solvedPath[self._revPath[cell]] = cell
             cell = self._revPath[cell]
@@ -318,6 +334,12 @@ class Dijkstra(Solver):
     @property
     def getTimeTaken(self):
         return round((self._endTime - self._startTime), 4)
+
+#########################################
+#                                       #
+#     CATEGORY B SKILL: DICTIONARIES    #
+#                                       #
+#########################################
 
 class RHW(Solver):
     def __init__(self, mazeGen:MazeGen):
@@ -354,16 +376,12 @@ class RHW(Solver):
         self._direction = tempDict
 
     def moveForward(self, x:int, y:int):
-    #if y-1 > 0:
         if self._direction["up"] == "N":
             return (x, y-1),"N"
-    #if x+1 < self._maze.getWidth:
         if self._direction["up"] == "E":
             return (x+1, y),"E"
-    #if y+1 < self._maze.getHeight:
         if self._direction["up"] == "S":
             return (x, y+1),"S"
-    #if x-1 >= 0:
         if self._direction["up"] == "W":
             return (x-1, y),"W"
             
@@ -429,6 +447,11 @@ class RHW(Solver):
     def getTimeTaken(self):
         return round((self._endTime - self._startTime), 4)
 
+#########################################
+#                                       #
+#     CATEGORY B SKILL: DICTIONARIES    #
+#                                       #
+#########################################
 
 class LHW(Solver):
     def __init__(self, mazeGen:MazeGen):

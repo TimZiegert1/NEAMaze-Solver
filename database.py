@@ -5,6 +5,12 @@ conn = sqlite3.connect('database.db')
 
 c = conn.cursor()
 
+###########################################################
+#                                                         #
+#     CATEGORY B SKILL: SIMPLE DATA MODEL IN DATABASE     #
+#                                                         #
+###########################################################
+
 # Create table
 
 c.execute("""CREATE TABLE IF NOT EXISTS Users (
@@ -33,6 +39,12 @@ def loginDataBase(username:str, password:str) -> bool:
     else:
         return False
 
+#####################################
+#                                   #
+#     CATEGORY A SKILL: HASHING     #
+#                                   #
+#####################################
+
 def registerDataBase(username:str, password:str):
     hashPassword = sha256(password.encode()).hexdigest()
     try:
@@ -42,7 +54,7 @@ def registerDataBase(username:str, password:str):
         """, {"name": f"{username}", "pwd":f"{hashPassword}"})
         conn.commit()
     except sqlite3.IntegrityError:
-        #print("This username is already in use")
+        #This means that the username is already taken
         return "Taken"
 
 def saveMazeDataBase(username:str, mazeName:str, mazeData:dict):
@@ -53,7 +65,7 @@ def saveMazeDataBase(username:str, mazeName:str, mazeData:dict):
         """, {"name": f"{username}", "mazeName": f"{mazeName}", "mazeData": f"{mazeData}"})
         conn.commit()
     except sqlite3.IntegrityError:
-        #print("This name is already in use")
+        #This means that the name is already taken
         return "Taken"
 
 def loadMazeDataBase(username:str, mazeName:str):
@@ -65,15 +77,3 @@ def loadMazeDataBase(username:str, mazeName:str):
         return mazeData[0]
     else:
         return False
-
-#register("admin2", "admin")
-
-# Insert a row of data
-#c.execute("INSERT INTO Users VALUES ('admin', 'admin')")
-#c.execute("INSERT INTO MazeSave VALUES (1, 'test', :mazeData)", {'mazeData': f"{maze.getMazeMap}"})
-#c.execute("SELECT * FROM Users WHERE username = 'admin' AND password = 'admin'") 
-#print(c.fetchone())
-
-#conn.commit()
-
-#conn.close()
