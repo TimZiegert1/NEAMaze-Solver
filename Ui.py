@@ -71,6 +71,7 @@ class Terminal(Ui):
         elif choice == -1:
             print("Goodbye!")
 
+    #Gives user generation options
     def generate(self):
         print("Choose a generation algorithm:")
         for key, value in self.__generateOptions.items():
@@ -90,6 +91,7 @@ class Terminal(Ui):
         elif solve == -1:
             print("Goodbye!")
 
+    #Gives user solve options
     def solve(self):
         for key, value in self.__solveOptions.items():
             print(f"{key}: {value}")
@@ -150,6 +152,7 @@ class GUI(Ui):
     def run(self):
         self.startPanel()
 
+    #Starts the main tkinter panel
     def startPanel(self):
         self._main.title("Main")
         mazeButton = tk.Button(self._main, text="Maze",width=20,height=3, command=lambda: [self._main.quit(), self.checkLogin()] )
@@ -162,6 +165,7 @@ class GUI(Ui):
         quitButton.grid(row=3, column=0)
         self._main.mainloop()
 
+    #Checks if the user is logged in, if they are, it will open the maze panel, if not, it will raise an error
     def checkLogin(self):
         if self._login == True:
             self._main.destroy()
@@ -170,6 +174,7 @@ class GUI(Ui):
             tkMessageBox.showwarning("Error", "Please login to continue, Note: You can register if you do not have an account.", icon="warning")
             self.loginPanel()
 
+    #Creates the login tkinter panel
     def loginPanel(self):
         if self._login == True:
             tkMessageBox.showinfo("Error", "You are already logged in!", icon="exaclamation")
@@ -193,6 +198,7 @@ class GUI(Ui):
             closeButton.grid(row=2, column=3)
             loginScreen.mainloop()
 
+    #Creates the register tkinter panel
     def registerPanel(self):
         registerScreen = tk.Tk()
         registerScreen.title("Register")
@@ -217,6 +223,7 @@ class GUI(Ui):
         close.grid(row=3, column=1)
         registerScreen.mainloop()
 
+    #Checks if the password and confirm password match, if they do, it will register the user, if not, it will raise an error
     def checkPasswordMatch(self, username, password, password2, screen):
         if username == "":
             tkMessageBox.showwarning("Error", "Please enter a username!", icon="warning")
@@ -229,6 +236,7 @@ class GUI(Ui):
         elif password != password2 and password != "" and password2 != "":
             tkMessageBox.showwarning("Error", "Passwords do not match!", icon="warning")
 
+    #Creates the help tkinter panel
     def helpPanel(self):
         helpWindow = tk.Tk()
         helpWindow.title("Help")
@@ -254,6 +262,7 @@ class GUI(Ui):
         helpWindow.mainloop()
 
 
+    #Creates the settings tkinter panel
     def settingsPanel(self):
         self._settings = tk.Tk()
         self._settings.deiconify()
@@ -296,6 +305,7 @@ class GUI(Ui):
         logoutButton.grid(row=8, column=0)
         self._settings.mainloop()
 
+    #Applies the settings to the program
     def applyButton(self, hBox, wBox, speedSliderSearch, speedSliderSolve, startPosbox, endPosbox, BTDropDownClick):
         if hBox.get() == "" or wBox.get() == "" or hBox.get().isdigit() == False or wBox.get().isdigit() == False or int(hBox.get()) < 4 or int(wBox.get()) < 4 or int(hBox.get()) > 200 or int(wBox.get()) > 200:
             pass
@@ -334,6 +344,7 @@ class GUI(Ui):
         self._settings.destroy()
         self.mazePanel()
 
+    #Main pygame loop, draws the maze and buttons
     def mazePanel(self):
         self._mazeScreen = pygame.display.set_mode((1375,850), flags=pygame.SHOWN)
         self._mazeScreen.fill((255,255,255))
@@ -551,6 +562,7 @@ class GUI(Ui):
                 
         pygame.quit()
 
+    #Draws the walls of the maze
     def drawWalls(self,mazeMap):
         y=-1
         for _ in range(self._height): # height
@@ -567,6 +579,7 @@ class GUI(Ui):
                     pygame.draw.rect(self._mazeScreen, self._colours["black"], (((x*self.__xBox)+(x-1)*self.__xWall)+(2*self.__xWall),(y*(self.__yBox+self.__yWall))+self.__yWall,self.__yWall,self.__yBox+(2*self.__yWall)))
                 x += 1
 
+    #Draw maze
     def drawMaze(self, mazeMap):
         y=-1
         for _ in range(self._height): # height
@@ -623,6 +636,7 @@ class GUI(Ui):
             elif cell == "Dead End":
                 pass
 
+    #Pause button. step forward and back buttons
     def pause(self, index, searchPath):
         self._isPaused = True
         self.drawPauseButton()
@@ -709,6 +723,7 @@ class GUI(Ui):
 #                                               #
 #################################################
 
+    #Draws the maze solution and the search path
     def drawMazeSolve(self, mazeMap, searchPath, solvePath, searchTime = 0.15, solveTime = 0.05, index = 0):
         head = 0
         while True:
@@ -760,6 +775,7 @@ class GUI(Ui):
                 break
         pygame.display.update()    
 
+    #Gets the rescale values
     def getRescaleValue(self, width, height):
         rescaleValue = 900
         rescaleHeight = rescaleValue/height
@@ -770,7 +786,7 @@ class GUI(Ui):
         yWalls = y/10
         return x, y, xWalls, yWalls
 
-
+    #Draws the buttons
     def drawButtons(self):
         #Solve Border
         pygame.draw.rect(self._mazeScreen, self._colours["black"] ,(850,100,500,350))

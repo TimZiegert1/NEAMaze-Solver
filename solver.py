@@ -75,23 +75,23 @@ class DFS(Solver):
 
     def run(self):
         self._startTime = time.time()
-        self.solve(self._startPos[0], self._startPos[1])
+        self.__solve(self._startPos[0], self._startPos[1])
 
-    def deadEnd(self):
+    def __deadEnd(self):
         self._stack.pop()
         if len(self._stack) != 0:
             self._stackSearched.append(self._stack[-1])
         if self.findNextMove(self._stack[-1][0], self._stack[-1][1]) == "DeadEnd":
-            self.deadEnd()
+            self.__deadEnd()
 
-    def solve(self, x:int, y:int):
+    def __solve(self, x:int, y:int):
         if self.checkIsEnd(x, y) == "End":
             for item in self._stackSearched:
                 if item == "DeadEnd":
                     self._stackSearched.remove(item)
             print("Solved")
             self._endTime = time.time()
-            self.setSolution()
+            self.__setSolution()
             self._tempStackSearched = self._stackSearched.copy()
             self._stackSearched = []
             self._tempStack = self._stack.copy()
@@ -100,19 +100,20 @@ class DFS(Solver):
         self._stack.append(self.findNextMove(x, y))
         self._stackSearched.append(self._stack[-1])
         if self._stack[-1] == "DeadEnd":
-            self.deadEnd()
+            self.__deadEnd()
         try:
             self._mazeMap[self._stack[-1][0], self._stack[-1][1]]["Type"] = 2
         except:
             #this error occurs when the stack is empty, only happens on the second solve in huntandkill
-            print("Dont hit solve twice")
+            #print("Dont hit solve twice")
+            pass
         try:
             #time.sleep(0.5)
-            self.solve(self._stack[-1][0], self._stack[-1][1])
+            self.__solve(self._stack[-1][0], self._stack[-1][1])
         except IndexError:
             pass
 
-    def setSolution(self):
+    def __setSolution(self):
         for cell in self._mazeMap:
             self._mazeMap[cell[0], cell[1]]["Type"] = 0
         for cell in self._stackSearched:
@@ -155,40 +156,40 @@ class AStar(Solver):
         self._gScore = {cell: float("inf") for cell in self._mazeMap}
         self._fScore = {cell: float("inf") for cell in self._mazeMap}
         self._pQueue = PriorityQueue()
-        self._pQueue.put((self.heuristic(self._start, self._end),self.heuristic(self._start, self._end), (self._start)))
+        self._pQueue.put((self.__heuristic(self._start, self._end),self.__heuristic(self._start, self._end), (self._start)))
         self._gScore[self._start] = 0
-        self._fScore[self._start] = self.heuristic(self._start, self._end)
+        self._fScore[self._start] = self.__heuristic(self._start, self._end)
         self._startTime = 0
         self._endTime = 0
     
     def run(self):
         self._startTime = time.time()
-        self.algorithm()
+        self.__algorithm()
 
-    def heuristic(self, cell1, cell2) -> int:
+    def __heuristic(self, cell1, cell2) -> int:
         x1, y1 = cell1
         x2, y2 = cell2
         return abs(x1-x2) + abs(y1-y2)
     
-    def algorithm(self):
+    def __algorithm(self):
         currCell=self._pQueue.get()[2]
         if self.checkIsEnd(currCell[0], currCell[1]) == "End":
             self._endTime = time.time()
             self._searchPath[self._end] = currCell
             print("Solved")
-            self.setSolution()
+            self.__setSolution()
             return "Solved"
         for childCell in self.checkNeighCells(currCell[0], currCell[1]):
             tempGScore = self._gScore[currCell] + 1
-            tempFScore = tempGScore + self.heuristic(childCell, self._end)
+            tempFScore = tempGScore + self.__heuristic(childCell, self._end)
             if tempFScore < self._fScore[childCell]:
                 self._searchPath[childCell] = currCell
                 self._gScore[childCell] = tempGScore
-                self._fScore[childCell] = tempGScore + self.heuristic(childCell, self._end)
-                self._pQueue.put((self._fScore[childCell], self.heuristic(childCell, self._end), childCell))
-        self.algorithm()
+                self._fScore[childCell] = tempGScore + self.__heuristic(childCell, self._end)
+                self._pQueue.put((self._fScore[childCell], self.__heuristic(childCell, self._end), childCell))
+        self.__algorithm()
 
-    def setSolution(self):
+    def __setSolution(self):
         cell = self._end
         while cell != self._start:
             self._solvePath[self._searchPath[cell]] = cell
@@ -233,14 +234,14 @@ class BFS(Solver):
         self._startTime = time.time()
         self.solve()
 
-    def solve(self):
+    def __solve(self):
         try:
             currCell = self._front.pop(0)
             if self.checkIsEnd(currCell[0], currCell[1]) == "End":
                 self._searched[self._end] = currCell
                 print("Solved")
                 self._endTime = time.time()
-                self.setSolution()
+                self.__setSolution()
                 return "Solved"
             for childCell in self.checkNeighCells(currCell[0], currCell[1]):
                 self._mazeMap[childCell[0], childCell[1]]["Type"] = 5
@@ -251,7 +252,7 @@ class BFS(Solver):
             pass
 
 
-    def setSolution(self):
+    def __setSolution(self):
         cell = self._end
         while cell != self._start:
             self._solvePath[self._searched[cell]] = cell
@@ -295,14 +296,14 @@ class Dijkstra(Solver):
     def run(self):
         self._startTime = time.time()
         self._mazeMap[self._endPos[0], self._endPos[1]]["Type"] = 4
-        self.solve()
+        self.__solve()
 
-    def solve(self):
+    def __solve(self):
         currCell = min(self._unVisited, key=self._unVisited.get)
         if self.checkIsEnd(currCell[0], currCell[1]) == "End" and self._solved == False:
             self._endTime = time.time()
             self._revPath[tuple(self._endPos)] = currCell
-            self.setSolution()
+            self.__setSolution()
         else:
             self._searched[currCell] = self._unVisited[currCell]
             for childCell in self.checkNeighCells(currCell[0], currCell[1]):
@@ -313,9 +314,9 @@ class Dijkstra(Solver):
                     self._unVisited[childCell] = tempDist
                     self._revPath[childCell] = currCell
             self._unVisited.pop(currCell)
-            self.solve()
+            self.__solve()
 
-    def setSolution(self):
+    def __setSolution(self):
         cell = tuple(self._maze.getEndPos)
         while cell != tuple(self._maze.getStartPos):
             self._solvedPath[self._revPath[cell]] = cell
@@ -363,19 +364,19 @@ class RHW(Solver):
             self._mazeMap[self._maze.getStartPos[0], self._maze.getStartPos[1]]["N"] = 1
         if self._start[1] == self._maze.getHeight:
             self._mazeMap[self._maze.getStartPos[0], self._maze.getStartPos[1]]["S"] = 1
-        self.solve()
+        self.__solve()
 
-    def rotateCW(self):
+    def __rotateCW(self):
         values = list(self._direction.values())
         tempDict = dict(zip(self._direction.keys(), [values[-1]]+values[:-1]))
         self._direction = tempDict
 
-    def rotateCCW(self):
+    def __rotateCCW(self):
         values = list(self._direction.values())
         tempDict = dict(zip(self._direction.keys(), values[1:]+[values[0]]))
         self._direction = tempDict
 
-    def moveForward(self, x:int, y:int):
+    def __moveForward(self, x:int, y:int):
         if self._direction["up"] == "N":
             return (x, y-1),"N"
         if self._direction["up"] == "E":
@@ -384,34 +385,29 @@ class RHW(Solver):
             return (x, y+1),"S"
         if self._direction["up"] == "W":
             return (x-1, y),"W"
-            
 
-    def deadEnd(self):
-        self._stack.pop()
-        self.solve(self._stack[-1][0], self._stack[-1][1])
-    
-    def solve(self):
+    def __solve(self):
         currCell = self.findNextMove(self._maze.getStartPos[0], self._maze.getStartPos[1])
         while True:
             self._stack.append(currCell)
             if self.checkIsEnd(currCell[0], currCell[1]) == "End":
                 self._endTime = time.time()
                 print("Solved")
-                self.setSolution()
+                self.__setSolution()
                 return "Solved"
             if self._mazeMap[currCell][self._direction["right"]] == 1:
                 if self._mazeMap[currCell][self._direction["up"]] == 1:
-                    self.rotateCCW()
+                    self.__rotateCCW()
                 else:
-                    currCell,d=self.moveForward(currCell[0], currCell[1])
+                    currCell,d=self.__moveForward(currCell[0], currCell[1])
                     self._path += d
             else:
-                self.rotateCW()
-                currCell,d=self.moveForward(currCell[0], currCell[1])
+                self.__rotateCW()
+                currCell,d=self.__moveForward(currCell[0], currCell[1])
                 self._path += d
 
 
-    def setSolution(self):
+    def __setSolution(self):
         currCell = self._stack[0]
         while "EW" in self._path or "WE" in self._path or "NS" in self._path or "SN" in self._path:
             self._path = self._path.replace("EW", "")
@@ -475,19 +471,19 @@ class LHW(Solver):
             self._mazeMap[self._maze.getStartPos[0], self._maze.getStartPos[1]]["N"] = 1
         if self._start[1] == self._maze.getHeight:
             self._mazeMap[self._maze.getStartPos[0], self._maze.getStartPos[1]]["S"] = 1
-        self.solve()
+        self.__solve()
 
-    def rotateCW(self):
+    def __rotateCW(self):
         values = list(self._direction.values())
         tempDict = dict(zip(self._direction.keys(), [values[-1]]+values[:-1]))
         self._direction = tempDict
 
-    def rotateCCW(self):
+    def __rotateCCW(self):
         values = list(self._direction.values())
         tempDict = dict(zip(self._direction.keys(), values[1:]+[values[0]]))
         self._direction = tempDict
 
-    def moveForward(self, x:int, y:int):
+    def __moveForward(self, x:int, y:int):
         if self._direction["up"] == "N":
             return (x, y-1),"N"
         if self._direction["up"] == "E":
@@ -497,28 +493,28 @@ class LHW(Solver):
         if self._direction["up"] == "W":
             return (x-1, y),"W"
     
-    def solve(self):
+    def __solve(self):
         currCell = self.findNextMove(self._maze.getStartPos[0], self._maze.getStartPos[1])
         while True:
             self._stack.append(currCell)
             if self.checkIsEnd(currCell[0], currCell[1]) == "End":
                 self._endTime = time.time()
                 print("Solved")
-                self.setSolution()
+                self.__setSolution()
                 return "Solved"
             if self._mazeMap[currCell][self._direction["left"]] == 1:
                 if self._mazeMap[currCell][self._direction["up"]] == 1:
-                    self.rotateCW()
+                    self.__rotateCW()
                 else:
-                    currCell,d=self.moveForward(currCell[0], currCell[1])
+                    currCell,d=self.__moveForward(currCell[0], currCell[1])
                     self._path += d
             else:
-                self.rotateCCW()
-                currCell,d=self.moveForward(currCell[0], currCell[1])
+                self.__rotateCCW()
+                currCell,d=self.__moveForward(currCell[0], currCell[1])
                 self._path += d
 
 
-    def setSolution(self):
+    def __setSolution(self):
         currCell = self._stack[0]
         while "EW" in self._path or "WE" in self._path or "NS" in self._path or "SN" in self._path:
             self._path = self._path.replace("EW", "")

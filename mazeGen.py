@@ -21,6 +21,8 @@ class MazeGen():
 #                                              #
 ################################################
 
+    #Generates the blank maze
+
     def genMaze(self) -> dict: 
         '''
         Generates the raw maze dict base with its Walls and type
@@ -55,6 +57,8 @@ class MazeGen():
     @property
     def getTempMaze(self) -> dict:
         return self.tempMaze
+
+    #Sets the start and end positions
 
     def pickEdge(self) -> list:
         '''

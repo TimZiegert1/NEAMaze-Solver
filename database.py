@@ -24,8 +24,7 @@ c.execute("""CREATE TABLE IF NOT EXISTS MazeSave(
     MazeData blob
 )""")
 
-#print(maze.getMazeMap)
-
+# Login function
 def loginDataBase(username:str, password:str) -> bool:
     
     #hash the password
@@ -45,6 +44,8 @@ def loginDataBase(username:str, password:str) -> bool:
 #                                   #
 #####################################
 
+
+# Register function
 def registerDataBase(username:str, password:str):
     hashPassword = sha256(password.encode()).hexdigest()
     try:
@@ -57,6 +58,7 @@ def registerDataBase(username:str, password:str):
         #This means that the username is already taken
         return "Taken"
 
+# Save maze function
 def saveMazeDataBase(username:str, mazeName:str, mazeData:dict):
     try:
         c.execute("""
@@ -68,6 +70,7 @@ def saveMazeDataBase(username:str, mazeName:str, mazeData:dict):
         #This means that the name is already taken
         return "Taken"
 
+# Load maze function
 def loadMazeDataBase(username:str, mazeName:str):
     c.execute(
     "SELECT MazeData FROM MazeSave WHERE User = :name AND MazeName = :mazeName", {"name": f"{username}", "mazeName": f"{mazeName}"}

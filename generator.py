@@ -122,18 +122,17 @@ class RBT(Generator):
 
     def run(self):
         self.changeCellType(self._maze.getEndPos[0], self._maze.getEndPos[1], 0)
-        self.generate(self._maze.getStartPos[0], self._maze.getStartPos[1])
+        self.__generate(self._maze.getStartPos[0], self._maze.getStartPos[1])
 
-    def deadEnd(self):
+    def __deadEnd(self):
         self._stack.pop()
         try:
             if self.findNextMove(self._stack[-1][1], self._stack[-1][2]) == "Dead End":
-                self.deadEnd()
+                self.__deadEnd()
         except:
             pass
 
-    def generate(self, x, y):
-        #self._stack.append(self.getStartPos)
+    def __generate(self, x, y):
         self._stack.append(self.findNextMove(x,y))
         self._stackGen.append(self.findNextMove(x,y))
         if self._stack[-1][0] == "S":
@@ -145,13 +144,13 @@ class RBT(Generator):
         elif self._stack[-1][0] == "N":
             self.delNorth(self._stack[-1][1],self._stack[-1][2])
         elif self._stack[-1] == "Dead End":
-            self.deadEnd()     
+            self.__deadEnd()     
         try:
             self.changeCellType(self._stack[-1][1],self._stack[-1][2],1)
         except:
             pass
         try:
-            self.generate(self._stack[-1][1], self._stack[-1][2])       
+            self.__generate(self._stack[-1][1], self._stack[-1][2])       
         except IndexError:
             self.changeCellType(self._maze.getEndPos[0], self._maze.getEndPos[1], 4)
             tempMaze = copy.deepcopy(self._mazeMap)
@@ -178,9 +177,9 @@ class HuntAndKill(Generator):
 
     def run(self):
         self.changeCellType(self._maze.getEndPos[0], self._maze.getEndPos[1], 0)
-        self.algorithm(self._maze.getStartPos[0], self._maze.getStartPos[1])
+        self.__algorithm(self._maze.getStartPos[0], self._maze.getStartPos[1])
 
-    def findHunt(self, x, y):
+    def __findHunt(self, x, y):
         neighCells = []
         try:
             if self._mazeMap[x,y+1]["Type"] == 1: 
@@ -206,7 +205,7 @@ class HuntAndKill(Generator):
         if len(neighCells) == 0: return "Dead End"
         return random.choice(neighCells)    
 
-    def checkSolved(self):
+    def __checkSolved(self):
         for cell in self._mazeMap:
             if self._mazeMap[cell]["Type"] == 0:
                 return False
@@ -215,12 +214,12 @@ class HuntAndKill(Generator):
     def checkLineSolved(self):
         count = 0
         for x in range(self._maze.getWidth):
-            if self.findHunt(x+1, self._lastSolvedLine) == "Dead End" and self._mazeMap[x+1, self._lastSolvedLine]["Type"] == 1:
+            if self.__findHunt(x+1, self._lastSolvedLine) == "Dead End" and self._mazeMap[x+1, self._lastSolvedLine]["Type"] == 1:
                 count += 1
             if count == self._maze.getWidth:
                 self._lastSolvedLine += 1
 
-    def deadEnd(self):
+    def __deadEnd(self):
         self.checkLineSolved()
         y = -1+self._lastSolvedLine
         for _ in range(self._maze.getHeight):
@@ -228,10 +227,10 @@ class HuntAndKill(Generator):
             y += 1
             if y <= self._maze.getHeight:
                 for _ in range(self._maze.getWidth):
-                    if self._mazeMap[x, y]["Type"] == 0 and self.findHunt(x, y) != "Dead End":
+                    if self._mazeMap[x, y]["Type"] == 0 and self.__findHunt(x, y) != "Dead End":
                         self._stack.append((x, y))
                         self._mazeMap[x, y]["Type"] = 1
-                        delWall = self.findHunt(x,y)
+                        delWall = self.__findHunt(x,y)
                         if delWall == "S":
                             self.delSouth(x,y)
                         elif delWall == "W":
@@ -240,15 +239,15 @@ class HuntAndKill(Generator):
                             self.delEast(x,y)
                         elif delWall == "N":
                             self.delNorth(x,y)
-                        self.algorithm(x, y)
+                        self.__algorithm(x, y)
                     x+=1
             else:
                 pass
 
 
-    def algorithm(self, x, y):
+    def __algorithm(self, x, y):
         self._stack.append(self.findNextMove(x,y))
-        if self.checkSolved() == True:
+        if self.__checkSolved() == True:
             self._stack.pop()
             self.changeCellType(self._maze.getStartPos[0], self._maze.getStartPos[1], 3)
             self.changeCellType(self._maze.getEndPos[0], self._maze.getEndPos[1], 4)
@@ -266,13 +265,13 @@ class HuntAndKill(Generator):
             self.delNorth(self._stack[-1][1],self._stack[-1][2])
         elif self._stack[-1] == "Dead End":
             self._stack.pop()
-            self.deadEnd() 
+            self.__deadEnd() 
         try:
             self.changeCellType(self._stack[-1][1],self._stack[-1][2],1)
         except:
             pass
         try:
-            self.algorithm(self._stack[-1][1], self._stack[-1][2]) 
+            self.__algorithm(self._stack[-1][1], self._stack[-1][2]) 
         except:
             pass      
 
@@ -290,9 +289,9 @@ class BinaryTree(Generator):
     def run(self, direction:str):
         self.changeCellType(self._maze.getStartPos[0], self._maze.getStartPos[1], 0)
         self.changeCellType(self._maze.getEndPos[0], self._maze.getEndPos[1], 0)
-        self.algorithm(direction)
+        self.__algorithm(direction)
 
-    def algorithm(self, direction):
+    def __algorithm(self, direction):
         for cell in self._mazeMap:
             if direction == "NW":
                 self._mazeMap[cell]["Type"] = 1
